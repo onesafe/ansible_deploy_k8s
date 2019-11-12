@@ -1,0 +1,41 @@
+[Unit]
+Description=Etcd Server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+Documentation=https://github.com/coreos
+
+[Service]
+Type=notify
+WorkingDirectory={{ ETCD_DATA_DIR }}
+ExecStart=/opt/k8s/bin/etcd \
+  --data-dir={{ ETCD_DATA_DIR }} \
+  --wal-dir={{ ETCD_WAL_DIR }} \
+  --name={{ inventory_hostname }} \
+  --cert-file=/etc/etcd/cert/etcd.pem \
+  --key-file=/etc/etcd/cert/etcd-key.pem \
+  --trusted-ca-file=/etc/kubernetes/cert/ca.pem \
+  --peer-cert-file=/etc/etcd/cert/etcd.pem \
+  --peer-key-file=/etc/etcd/cert/etcd-key.pem \
+  --peer-trusted-ca-file=/etc/kubernetes/cert/ca.pem \
+  --peer-client-cert-auth \
+  --client-cert-auth \
+  --listen-peer-urls=https://{{ ansible_host }}:2380 \
+  --initial-advertise-peer-urls=https://{{ ansible_host }}:2380 \
+  --listen-client-urls=https://{{ ansible_host }}:2379,http://127.0.0.1:2379 \
+  --advertise-client-urls=https://{{ ansible_host }}:2379 \
+  --initial-cluster-token=etcd-cluster-0 \
+  --initial-cluster={{ ETCD_NODES }} \
+  --initial-cluster-state=new \
+  --auto-compaction-mode=periodic \
+  --auto-compaction-retention=1 \
+  --max-request-bytes=33554432 \
+  --quota-backend-bytes=6442450944 \
+  --heartbeat-interval=250 \
+  --election-timeout=2000
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

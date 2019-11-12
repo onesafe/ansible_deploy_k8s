@@ -6,6 +6,15 @@ k8s_3: 116.85.5.120
 # kube-apiserver 的反向代理(kube-nginx)地址端口
 KUBE_APISERVER: "https://127.0.0.1:8443"
 
+# etcd 数据目录
+ETCD_DATA_DIR: "/data/k8s/etcd/data"
+
+# etcd WAL 目录，建议是 SSD 磁盘分区，或者和 ETCD_DATA_DIR 不同的磁盘分区
+ETCD_WAL_DIR: "/data/k8s/etcd/wal"
+
+# etcd 集群间通信的 IP 和端口
+ETCD_NODES: "k8s_1=https://116.85.48.223:2380,k8s_2=https://116.85.27.72:2380,k8s_3=https://116.85.5.120:2380"
+
 # 生成 EncryptionConfig 所需的加密 key
 ENCRYPTION_KEY: $(head -c 32 /dev/urandom | base64)
 
@@ -18,17 +27,8 @@ NODE_NAMES: (k8s_1 k8s_2 k8s_3)
 # etcd 集群服务地址列表
 ETCD_ENDPOINTS: "https://116.85.48.223:2379,https://116.85.27.72:2379,https://116.85.5.120:2379"
 
-# etcd 集群间通信的 IP 和端口
-ETCD_NODES: "k8s_1=https://116.85.48.223:2380,k8s_2=https://116.85.27.72:2380,k8s_3=https://116.85.5.120:2380"
-
 # 节点间互联网络接口名称
 IFACE: "eth0"
-
-# etcd 数据目录
-ETCD_DATA_DIR: "/data/k8s/etcd/data"
-
-# etcd WAL 目录，建议是 SSD 磁盘分区，或者和 ETCD_DATA_DIR 不同的磁盘分区
-ETCD_WAL_DIR: "/data/k8s/etcd/wal"
 
 # k8s 各组件数据目录
 K8S_DIR: "/data/k8s/k8s"

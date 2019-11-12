@@ -2,3 +2,4 @@
 - include: prepare.yml
 - include: cert.yml
 - include: kubectl.yml
+- include: etcd.yml
