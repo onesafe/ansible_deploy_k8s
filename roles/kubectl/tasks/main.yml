@@ -1,0 +1,58 @@
+- name: Copy kubectl bin
+  copy:
+    src: kubectl
+    dest: /opt/k8s/bin
+    mode: 0755
+
+- name: Generate admin cert
+  shell: "roles/cert/bin/cfssl gencert -ca=roles/cert/files/ca.pem 
+  -ca-key=roles/cert/files/ca-key.pem
+  -config roles/cert/files/ca-config.json 
+  -profile=kubernetes roles/kubectl/files/admin-csr.json 
+  | roles/cert/bin/cfssljson -bare roles/kubectl/files/admin"
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate kubeconfig file | Set cluster
+  shell: "roles/kubectl/files/kubectl config set-cluster kubernetes 
+  --certificate-authority=roles/cert/files/ca.pem 
+  --embed-certs=true 
+  --server={{ KUBE_APISERVER }} 
+  --kubeconfig=roles/kubectl/files/kubectl.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate kubeconfig file | Set client credentials
+  shell: "roles/kubectl/files/kubectl config set-credentials admin 
+  --client-certificate=roles/kubectl/files/admin.pem 
+  --client-key=roles/kubectl/files/admin-key.pem 
+  --embed-certs=true 
+  --kubeconfig=roles/kubectl/files/kubectl.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate kubeconfig file | Set context
+  shell: "roles/kubectl/files/kubectl config set-context kubernetes 
+  --cluster=kubernetes 
+  --user=admin 
+  --kubeconfig=roles/kubectl/files/kubectl.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate kubeconfig file | Use context
+  shell: "roles/kubectl/files/kubectl config use-context kubernetes 
+  --kubeconfig=roles/kubectl/files/kubectl.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Mkdir ~/.kube
+  file:
+    path: ~/.kube
+    state: directory
+    mode: 0755
+
+- name: Copy kube config file
+  copy:
+    src: kubectl.kubeconfig
+    dest: ~/.kube/config
+    mode: 0755

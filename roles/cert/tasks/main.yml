@@ -1,8 +1,7 @@
 - name: Generate ca cert
-  shell: "roles/cert/bin/cfssl gencert -initca roles/cert/local/ca-csr.json | roles/cert/bin/cfssljson -bare roles/cert/files/ca"
+  shell: "roles/cert/bin/cfssl gencert -initca roles/cert/files/ca-csr.json | roles/cert/bin/cfssljson -bare roles/cert/files/ca"
   delegate_to: localhost
   run_once: true
-  register: pwd_result
 
 - name: Copy ca-config.json
   copy:
