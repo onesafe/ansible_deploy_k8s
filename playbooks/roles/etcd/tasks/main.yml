@@ -1,0 +1,93 @@
+# - name: Copy etcd 
+#   copy:
+#     src: v3.3.13/bin/etcd
+#     dest: /opt/k8s/bin
+#     mode: 0755
+
+# - name: Copy etcdctl
+#   copy:
+#     src: v3.3.13/bin/etcdctl
+#     dest: /opt/k8s/bin
+#     mode: 0755
+
+# - name: Generate etcd certificate
+#   shell: "roles/cert/bin/cfssl gencert 
+#   -ca=roles/cert/files/ca.pem 
+#   -ca-key=roles/cert/files/ca-key.pem 
+#   -config=roles/cert/files/ca-config.json
+#   -profile=kubernetes roles/etcd/files/etcd-csr.json | 
+#   roles/cert/bin/cfssljson -bare roles/etcd/files/etcd "
+#   delegate_to: localhost
+#   run_once: true
+
+# - name: Mkdir /etc/etcd/cert
+#   file:
+#     path: /etc/etcd/cert
+#     state: directory
+#     mode: 0755
+
+# - name: Copy etcd-key.pem
+#   copy:
+#     src: etcd-key.pem
+#     dest: /etc/etcd/cert/etcd-key.pem
+#     mode: 0755
+
+# - name: Copy etcd.pem
+#   copy:
+#     src: etcd.pem
+#     dest: /etc/etcd/cert/etcd.pem
+#     mode: 0755
+
+# - name: Copy etcd.service
+#   template:
+#     src: etcd.service
+#     dest: /etc/systemd/system/etcd.service
+
+# - name: Mkdir ETCD_DATA_DIR
+#   file:
+#     path: "{{ ETCD_DATA_DIR }}"
+#     state: directory
+#     mode: 0755
+
+# - name: Mkdir ETCD_WAL_DIR
+#   file:
+#     path: "{{ ETCD_WAL_DIR }}"
+#     state: directory
+#     mode: 0755
+
+# - name: Just force systemd to reread configs (2.4 and above)
+#   systemd:
+#     daemon_reload: yes
+
+# - name: Enable etcd service
+#   systemd:
+#     name: etcd
+#     enabled: yes
+#     masked: no
+
+# - name: Restart etcd service
+#   systemd:
+#     state: restarted
+#     name: etcd
+
+- name: Check etcd health
+  shell: "ETCDCTL_API=3 /opt/k8s/bin/etcdctl --endpoints=https://{{ ansible_host }}:2379 
+  --cacert=/etc/kubernetes/cert/ca.pem --cert=/etc/etcd/cert/etcd.pem 
+  --key=/etc/etcd/cert/etcd-key.pem endpoint health"
+  register: etcd_health_res
+
+- name: Echo etcd health result
+  debug:
+    msg: "{{ etcd_health_res.stdout }}"
+
+- name: Get etcd leader
+  shell: "ETCDCTL_API=3 /opt/k8s/bin/etcdctl -w table --cacert=/etc/kubernetes/cert/ca.pem 
+  --cert=/etc/etcd/cert/etcd.pem --key=/etc/etcd/cert/etcd-key.pem 
+  --endpoints={{ ETCD_ENDPOINTS }} endpoint status "
+  register: etcd_leader_res
+  run_once: true
+
+- name: Echo etcd leader
+  debug:
+    msg: "{{ etcd_leader_res.stdout }}"
+  run_once: true

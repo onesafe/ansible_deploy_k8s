@@ -1,24 +1,24 @@
 # 主机清单文件
 
 [all]
-k8s_1 ansible_host=116.85.48.223  etcd_member_name=etcd1
-k8s_2 ansible_host=116.85.27.72 etcd_member_name=etcd2
-k8s_3 ansible_host=116.85.5.120 etcd_member_name=etcd3
+wyp_k8s01 ansible_host=172.27.129.68  etcd_member_name=etcd1
+wyp_k8s02 ansible_host=172.27.129.69 etcd_member_name=etcd2
+wyp_k8s03 ansible_host=172.27.129.70 etcd_member_name=etcd3
 
 [etcd]
-k8s_1
-k8s_2
-k8s_3
+wyp_k8s01
+wyp_k8s02
+wyp_k8s03
 
 [k8s_master]
-k8s_1
-k8s_2
-k8s_3
+wyp_k8s01
+wyp_k8s02
+wyp_k8s03
 
 [k8s_node]
-k8s_1
-k8s_2
-k8s_3
+wyp_k8s03
+wyp_k8s03
+wyp_k8s03
 
 [k8s_cluster:children]
 etcd

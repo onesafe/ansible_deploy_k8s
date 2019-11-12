@@ -15,6 +15,9 @@
 - name: Source /root/.bashrc
   shell: "source /root/.bashrc"
 
+- name: Yum update
+  shell: "yum -y update"
+
 - name: Yum install dependency
   yum:
     name:
@@ -24,7 +27,7 @@
       - ntp
       - ipvsadm
       - ipset
-      - jq
+      #- jq
       - iptables
       - curl
       - sysstat

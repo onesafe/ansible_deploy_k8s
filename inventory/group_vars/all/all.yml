@@ -1,7 +1,7 @@
 ---
-k8s_1: 116.85.48.223
-k8s_2: 116.85.27.72
-k8s_3: 116.85.5.120
+wyp_k8s01: 172.27.129.68
+wyp_k8s02: 172.27.129.69
+wyp_k8s03: 172.27.129.70
 
 # kube-apiserver 的反向代理(kube-nginx)地址端口
 KUBE_APISERVER: "https://127.0.0.1:8443"
@@ -13,19 +13,19 @@ ETCD_DATA_DIR: "/data/k8s/etcd/data"
 ETCD_WAL_DIR: "/data/k8s/etcd/wal"
 
 # etcd 集群间通信的 IP 和端口
-ETCD_NODES: "k8s_1=https://116.85.48.223:2380,k8s_2=https://116.85.27.72:2380,k8s_3=https://116.85.5.120:2380"
+ETCD_NODES: "wyp_k8s01=https://172.27.129.68:2380,wyp_k8s02=https://172.27.129.69:2380,wyp_k8s03=https://172.27.129.70:2380"
 
 # 生成 EncryptionConfig 所需的加密 key
 ENCRYPTION_KEY: $(head -c 32 /dev/urandom | base64)
 
 # 集群各机器 IP 数组
-NODE_IPS: (116.85.48.223 116.85.27.72 116.85.5.120)
+NODE_IPS: (172.27.129.68 172.27.129.69 172.27.129.70)
 
 # 集群各 IP 对应的主机名数组
-NODE_NAMES: (k8s_1 k8s_2 k8s_3)
+NODE_NAMES: (wyp_k8s01 wyp_k8s02 wyp_k8s03)
 
 # etcd 集群服务地址列表
-ETCD_ENDPOINTS: "https://116.85.48.223:2379,https://116.85.27.72:2379,https://116.85.5.120:2379"
+ETCD_ENDPOINTS: "https://172.27.129.68:2379,https://172.27.129.69:2379,https://172.27.129.70:2379"
 
 # 节点间互联网络接口名称
 IFACE: "eth0"

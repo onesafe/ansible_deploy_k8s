@@ -1,5 +1,17 @@
+- name: Get current path
+  shell: "pwd"
+  delegate_to: localhost
+  run_once: true
+  register: pwd_res
+
+- name: Echo current path
+  debug:
+    msg: "{{ pwd_res.stdout }}"
+  run_once: true
+
 - name: Generate ca cert
-  shell: "roles/cert/bin/cfssl gencert -initca roles/cert/files/ca-csr.json | roles/cert/bin/cfssljson -bare roles/cert/files/ca"
+  shell: "roles/cert/bin/cfssl gencert -initca roles/cert/files/ca-csr.json | 
+  roles/cert/bin/cfssljson -bare roles/cert/files/ca"
   delegate_to: localhost
   run_once: true
 
