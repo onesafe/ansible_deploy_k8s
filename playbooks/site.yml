@@ -3,3 +3,4 @@
 - include: cert.yml
 - include: kubectl.yml
 - include: etcd.yml
+- include: flannel.yml

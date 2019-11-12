@@ -1,0 +1,99 @@
+- name: Copy flanneld
+  copy:
+    src: v0.11.0/flanneld
+    dest: /opt/k8s/bin/flanneld
+    mode: 0755
+
+- name: Copy mk-docker-opts.sh
+  copy:
+    src: v0.11.0/mk-docker-opts.sh
+    dest: /opt/k8s/bin/mk-docker-opts.sh
+    mode: 0755
+
+- name: Generate flanneld certificate
+  shell: "roles/cert/bin/cfssl gencert 
+  -ca=roles/cert/files/ca.pem 
+  -ca-key=roles/cert/files/ca-key.pem 
+  -config=roles/cert/files/ca-config.json
+  -profile=kubernetes roles/flannel/files/flanneld-csr.json | 
+  roles/cert/bin/cfssljson -bare roles/flannel/files/flanneld "
+  delegate_to: localhost
+  run_once: true
+
+- name: Mkdir /etc/flanneld/cert
+  file:
+    path: /etc/flanneld/cert
+    state: directory
+    mode: 0755
+
+- name: Copy flanneld-key.pem
+  copy:
+    src: flanneld-key.pem
+    dest: /etc/flanneld/cert/flanneld-key.pem
+    mode: 0755
+
+- name: Copy flanneld.pem
+  copy:
+    src: flanneld.pem
+    dest: /etc/flanneld/cert/flanneld.pem
+    mode: 0755
+
+- name: Write etcd flannel network
+  shell: "/opt/k8s/bin/etcdctl --endpoints={{ ETCD_ENDPOINTS }} --ca-file=/etc/kubernetes/cert/ca.pem  
+  --cert-file=/etc/flanneld/cert/flanneld.pem --key-file=/etc/flanneld/cert/flanneld-key.pem
+  mk {{ FLANNEL_ETCD_PREFIX }}/config 
+  '{\"Network\":\"{{ CLUSTER_CIDR }}\", \"SubnetLen\": 21, \"Backend\": {\"Type\": \"vxlan\"}}'"
+  run_once: true
+
+- name: Get flanneld network
+  shell: "/opt/k8s/bin/etcdctl --endpoints={{ ETCD_ENDPOINTS }} 
+  --ca-file=/etc/kubernetes/cert/ca.pem --cert-file=/etc/flanneld/cert/flanneld.pem 
+  --key-file=/etc/flanneld/cert/flanneld-key.pem get {{ FLANNEL_ETCD_PREFIX }}/config"
+  run_once: true
+  register: flanneld_network_res
+
+- name: Echo flanneld network
+  debug:
+    msg: "{{ flanneld_network_res.stdout }}"
+  run_once: true
+
+- name: Copy flanneld.service
+  template:
+    src: flanneld.service
+    dest: /etc/systemd/system/flanneld.service
+
+- name: Just force systemd to reread configs (2.4 and above)
+  systemd:
+    daemon_reload: yes
+
+- name: Enable flanneld service
+  systemd:
+    name: flanneld
+    enabled: yes
+    masked: no
+
+- name: Restart flanneld service
+  systemd:
+    state: restarted
+    name: flanneld
+
+- name: Check flanneld pod network
+  shell: "/opt/k8s/bin/etcdctl --endpoints={{ ETCD_ENDPOINTS }} 
+  --ca-file=/etc/kubernetes/cert/ca.pem --cert-file=/etc/flanneld/cert/flanneld.pem 
+  --key-file=/etc/flanneld/cert/flanneld-key.pem ls {{ FLANNEL_ETCD_PREFIX }}/subnets"
+  run_once: true
+  register: flanneld_subnet_res
+
+- name: Echo flanneld subnet
+  debug:
+    msg: "{{ flanneld_subnet_res.stdout }}"
+  run_once: true
+
+- name: Ip show flannel.1
+  shell: "ip addr show flannel.1|grep -w inet"
+  register: ip_show_res
+
+- name: Echo ip show flannel.1 inet
+  debug:
+    msg: "{{ ip_show_res.stdout }}"
+
