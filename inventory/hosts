@@ -1,0 +1,26 @@
+# 主机清单文件
+
+[all]
+node1 ansible_host=116.85.48.223  etcd_member_name=etcd1
+node2 ansible_host=116.85.27.72 etcd_member_name=etcd2
+node3 ansible_host=116.85.5.120 etcd_member_name=etcd3
+
+[etcd]
+node1
+node2
+node3
+
+[k8s_master]
+node1
+node2
+node3
+
+[k8s_node]
+node1
+node2
+node3
+
+[k8s_cluster:children]
+etcd
+k8s_master
+k8s_node

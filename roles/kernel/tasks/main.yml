@@ -1,0 +1,11 @@
+- name: Rpm new kernel
+  shell: "rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm"
+
+- name: Yum install
+  shell: "yum --enablerepo=elrepo-kernel install -y kernel-lt"
+
+- name: Boot new kernel
+  shell: "grub2-set-default 0"
+
+- name: Reboot machine
+  shell: "reboot"

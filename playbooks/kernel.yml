@@ -1,0 +1,6 @@
+---
+# 升级内核
+- hosts: all
+  gather_facts: false
+  roles:
+  - kernel

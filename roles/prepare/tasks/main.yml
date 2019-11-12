@@ -1,0 +1,116 @@
+- name: Copy /etc/hosts file
+  template:
+    src: hosts
+    dest: /etc/hosts
+
+- name: Create user docker
+  user:
+    name: docker
+    shell: /bin/bash
+    password: docker
+
+- name: Export /opt/k8s/bin PATH
+  shell: "export PATH=/opt/k8s/bin:$PATH"
+
+- name: Source /root/.bashrc
+  shell: "source /root/.bashrc"
+
+- name: Yum install dependency
+  yum:
+    name:
+      - epel-release
+      - conntrack
+      - ntpdate
+      - ntp
+      - ipvsadm
+      - ipset
+      - jq
+      - iptables
+      - curl
+      - sysstat
+      - libseccomp
+      - wget
+    state: present
+
+# - name: Stop and disable fireward
+#   shell: "systemctl stop firewalld && systemctl disable firewalld"
+
+- name: Set iptables
+  shell: "iptables -F && iptables -X && iptables -F -t nat && iptables -X -t nat && iptables -P FORWARD ACCEPT"
+
+- name: Stop swap
+  shell: "swapoff -a && sed -i '/ swap / s/^\\(.*\\)$/#\\1/g' /etc/fstab "
+
+# - name: Stop SELinux
+#   shell: "setenforce 0 && sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config"
+
+# - name: Stop dnsmasq
+#   shell: "systemctl stop dnsmasq && systemctl disable dnsmasq"
+#   ignore_errors: true
+
+- name: Modprobe
+  shell: "modprobe ip_vs_rr && modprobe br_netfilter"
+
+- name: Copy /etc/sysctl.d/kubernetes.conf file
+  template:
+    src: kubernetes.conf
+    dest: /etc/sysctl.d/kubernetes.conf
+
+- name: Sysctl kubernetes.conf
+  shell: "sysctl -p /etc/sysctl.d/kubernetes.conf"
+
+- name: Set TimeZone
+  shell: "timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0 && systemctl restart rsyslog  && systemctl restart crond"
+
+- name: Stop useless service
+  shell: "systemctl stop postfix && systemctl disable postfix"
+
+- name: Mkdir journal dir
+  file:
+    path: /var/log/journal
+    state: directory
+    mode: "0755"
+
+- name: Mkdir journald dir
+  file:
+    path: /etc/systemd/journald.conf.d
+    state: directory
+    mode: "0755"
+
+- name: Copy 99-test.conf
+  template:
+    src: 99-test.conf
+    dest: /etc/systemd/journald.conf.d/99-test.conf 
+
+- name: Restart systemd-journald
+  shell: "systemctl restart systemd-journald"
+
+- name: Mkdir /opt/k8s/bin
+  file:
+    path: /opt/k8s/bin
+    state: directory
+    mode: "0755"
+
+- name: Mkdir /opt/k8s/work
+  file:
+    path: /opt/k8s/work
+    state: directory
+    mode: "0755"
+
+- name: Mkdir /opt/k8s/cert
+  file:
+    path: /opt/k8s/cert
+    state: directory
+    mode: "0755"
+
+- name: Mkdir /etc/kubernetes/cert
+  file:
+    path: /etc/kubernetes/cert
+    state: directory
+    mode: "0755"
+
+- name: Mkdir /etc/etcd/cert
+  file:
+    path: /etc/etcd/cert
+    state: directory
+    mode: "0755"

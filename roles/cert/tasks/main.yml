@@ -1,0 +1,29 @@
+- name: Generate ca cert
+  shell: "roles/cert/bin/cfssl gencert -initca roles/cert/local/ca-csr.json | roles/cert/bin/cfssljson -bare roles/cert/files/ca"
+  delegate_to: localhost
+  run_once: true
+  register: pwd_result
+
+- name: Copy ca-config.json
+  copy:
+    src: "ca-config.json"
+    dest: "/etc/kubernetes/cert/ca-config.json"
+    mode: 0755
+
+- name: Copy ca.csr
+  copy:
+    src: "ca.csr"
+    dest: "/etc/kubernetes/cert/ca.csr"
+    mode: 0755
+
+- name: Copy ca.pem
+  copy:
+    src: "ca.pem"
+    dest: "/etc/kubernetes/cert/ca.pem"
+    mode: 0755
+
+- name: Copy ca-key.pem
+  copy:
+    src: "ca-key.pem"
+    dest: "/etc/kubernetes/cert/ca-key.pem"
+    mode: 0755
