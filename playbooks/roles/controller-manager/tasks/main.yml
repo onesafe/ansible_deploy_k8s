@@ -1,0 +1,89 @@
+- name: Generate kube-controller-manager certificate
+  shell: "roles/cert/bin/cfssl gencert 
+  -ca=roles/cert/files/ca.pem 
+  -ca-key=roles/cert/files/ca-key.pem 
+  -config=roles/cert/files/ca-config.json
+  -profile=kubernetes roles/controller-manager/files/kube-controller-manager-csr.json | 
+  roles/cert/bin/cfssljson -bare roles/controller-manager/files/kube-controller-manager"
+  delegate_to: localhost
+  run_once: true
+
+- name: Copy kube-controller-manager-key.pem
+  copy:
+    src: kube-controller-manager-key.pem
+    dest: /etc/kubernetes/cert/kube-controller-manager-key.pem
+    mode: 0755
+
+- name: Copy kube-controller-manager.pem
+  copy:
+    src: kube-controller-manager.pem
+    dest: /etc/kubernetes/cert/kube-controller-manager.pem
+    mode: 0755
+
+- name: Generate kube-controller-manager kubeconfig file | Set cluster
+  shell: "roles/kubectl/files/v1.14.2/kubectl config set-cluster kubernetes 
+  --certificate-authority=roles/cert/files/ca.pem 
+  --embed-certs=true 
+  --server={{ KUBE_APISERVER }} 
+  --kubeconfig=roles/controller-manager/files/kube-controller-manager.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate kube-controller-manager file | Set client credentials
+  shell: "roles/kubectl/files/v1.14.2/kubectl config set-credentials system:kube-controller-manager  
+  --client-certificate=roles/controller-manager/files/kube-controller-manager.pem 
+  --client-key=roles/controller-manager/files/kube-controller-manager-key.pem 
+  --embed-certs=true 
+  --kubeconfig=roles/controller-manager/files/kube-controller-manager.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate kube-controller-manager file | Set context
+  shell: "roles/kubectl/files/v1.14.2/kubectl config set-context system:kube-controller-manager  
+  --cluster=kubernetes 
+  --user=system:kube-controller-manager  
+  --kubeconfig=roles/controller-manager/files/kube-controller-manager.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate kube-controller-manager file | Use context
+  shell: "roles/kubectl/files/v1.14.2/kubectl config use-context system:kube-controller-manager  
+  --kubeconfig=roles/controller-manager/files/kube-controller-manager.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Copy kube-controller-manager.kubeconfig file
+  copy:
+    src: kube-controller-manager.kubeconfig
+    dest: /etc/kubernetes/kube-controller-manager.kubeconfig
+    mode: 0755
+
+- name: Copy kube-controller-manager.service.template file
+  template:
+    src: kube-controller-manager.service.template
+    dest: /etc/systemd/system/kube-controller-manager.service
+    mode: 0755
+
+- name: Just force systemd to reread configs (2.4 and above)
+  systemd:
+    daemon_reload: yes
+
+- name: Enable kube-controller-manager service
+  systemd:
+    name: kube-controller-manager
+    enabled: yes
+    masked: no
+
+- name: Restart kube-controller-manager service
+  systemd:
+    state: restarted
+    name: kube-controller-manager
+
+- name: Get kube-controller-manager status
+  shell: "systemctl status kube-controller-manager |grep 'Active:'"
+  register: kube_controller_manager_status
+
+- name: Echo kube-controller-manager 
+  debug:
+    msg: "{{ kube_controller_manager_status.stdout }}"
+
