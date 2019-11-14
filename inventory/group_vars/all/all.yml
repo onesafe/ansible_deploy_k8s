@@ -16,7 +16,8 @@ ETCD_WAL_DIR: "/data/k8s/etcd/wal"
 ETCD_NODES: "wyp_k8s01=https://172.27.129.68:2380,wyp_k8s02=https://172.27.129.69:2380,wyp_k8s03=https://172.27.129.70:2380"
 
 # 生成 EncryptionConfig 所需的加密 key
-ENCRYPTION_KEY: $(head -c 32 /dev/urandom | base64)
+# ENCRYPTION_KEY: $(head -c 32 /dev/urandom | base64)
+ENCRYPTION_KEY: HqZI+SHQbYPR+sB3ev5MGtvFHxfGiWeqAOxDqIe4D3Y=
 
 # 集群各机器 IP 数组
 NODE_IPS: (172.27.129.68 172.27.129.69 172.27.129.70)

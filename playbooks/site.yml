@@ -6,3 +6,4 @@
 - include: flannel.yml
 - include: kube-nginx.yml
 - include: master.yml
+- include: apiserver.yml

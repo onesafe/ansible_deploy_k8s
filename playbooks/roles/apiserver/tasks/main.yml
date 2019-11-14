@@ -1,0 +1,96 @@
+- name: Generate apiserver certificate
+  shell: "roles/cert/bin/cfssl gencert 
+  -ca=roles/cert/files/ca.pem 
+  -ca-key=roles/cert/files/ca-key.pem 
+  -config=roles/cert/files/ca-config.json
+  -profile=kubernetes roles/apiserver/files/kubernetes-csr.json | 
+  roles/cert/bin/cfssljson -bare roles/apiserver/files/kubernetes "
+  delegate_to: localhost
+  run_once: true
+
+- name: Copy kubernetes.pem
+  copy:
+    src: kubernetes.pem
+    dest: /etc/kubernetes/cert/kubernetes.pem
+    mode: 0755
+
+- name: Copy kubernetes-key.pem
+  copy:
+    src: kubernetes-key.pem
+    dest: /etc/kubernetes/cert/kubernetes-key.pem
+    mode: 0755
+
+- name: Copy encryption-config.yaml file
+  template:
+    src: encryption-config.yaml
+    dest: /etc/kubernetes/encryption-config.yaml
+    mode: 0755
+
+- name: Copy audit-policy.yaml file
+  copy:
+    src: audit-policy.yaml
+    dest: /etc/kubernetes/audit-policy.yaml
+    mode: 0755
+
+- name: Generate proxy-client certificate
+  shell: "roles/cert/bin/cfssl gencert 
+  -ca=roles/cert/files/ca.pem 
+  -ca-key=roles/cert/files/ca-key.pem 
+  -config=roles/cert/files/ca-config.json
+  -profile=kubernetes roles/apiserver/files/proxy-client-csr.json | 
+  roles/cert/bin/cfssljson -bare roles/apiserver/files/proxy-client "
+  delegate_to: localhost
+  run_once: true
+
+- name: Copy proxy-client.pem
+  copy:
+    src: proxy-client.pem
+    dest: /etc/kubernetes/cert/proxy-client.pem
+    mode: 0755
+
+- name: Copy proxy-client-key.pem
+  copy:
+    src: proxy-client-key.pem
+    dest: /etc/kubernetes/cert/proxy-client-key.pem
+    mode: 0755
+
+- name: Copy kube-apiserver.service.template file
+  template:
+    src: kube-apiserver.service.template
+    dest: /etc/systemd/system/kube-apiserver.service
+    mode: 0755
+
+- name: Just force systemd to reread configs (2.4 and above)
+  systemd:
+    daemon_reload: yes
+
+- name: Enable kube-apiserver service
+  systemd:
+    name: kube-apiserver
+    enabled: yes
+    masked: no
+
+- name: Restart kube-apiserver service
+  systemd:
+    state: restarted
+    name: kube-apiserver
+
+- name: Get kube-apiserver status
+  shell: "systemctl status kube-apiserver |grep 'Active:'"
+  register: kube_apiserver_status
+
+- name: Echo kube-apiserver subnet
+  debug:
+    msg: "{{ kube_apiserver_status.stdout }}"
+
+- name: Get kube-apiserver etcd data
+  shell: "ETCDCTL_API=3 /opt/k8s/bin/etcdctl --endpoints={{ ETCD_ENDPOINTS }} --cacert=/etc/kubernetes/cert/ca.pem --cert=/etc/etcd/cert/etcd.pem --key=/etc/etcd/cert/etcd-key.pem get /registry/ --prefix --keys-only"
+  register: etcd_kube_apiserver_data
+
+- name: Echo etcd kube-apiserver data
+  debug:
+    msg: "{{ etcd_kube_apiserver_data.stdout }}"
+
+- name: Grant kube-apiserver rbac to access kubelet api
+  shell: "/opt/k8s/bin/kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole=system:kubelet-api-admin --user kubernetes"
+  run_once: true
