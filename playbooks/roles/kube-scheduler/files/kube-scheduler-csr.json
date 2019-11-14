@@ -1,0 +1,22 @@
+{
+  "CN": "system:kube-scheduler",
+  "hosts": [
+    "127.0.0.1",
+    "{{ wyp_k8s01 }}",
+    "{{ wyp_k8s02 }}",
+    "{{ wyp_k8s03 }}"
+  ],
+  "key": {
+      "algo": "rsa",
+      "size": 2048
+  },
+  "names": [
+    {
+      "C": "CN",
+      "ST": "BeiJing",
+      "L": "BeiJing",
+      "O": "system:kube-scheduler",
+      "OU": "4Paradigm"
+    }
+  ]
+}

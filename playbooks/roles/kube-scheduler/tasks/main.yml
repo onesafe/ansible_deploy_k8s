@@ -1,0 +1,101 @@
+- name: Generate kube-scheduler certificate
+  shell: "roles/cert/bin/cfssl gencert 
+  -ca=roles/cert/files/ca.pem 
+  -ca-key=roles/cert/files/ca-key.pem 
+  -config=roles/cert/files/ca-config.json
+  -profile=kubernetes roles/kube-scheduler/files/kube-scheduler-csr.json | 
+  roles/cert/bin/cfssljson -bare roles/kube-scheduler/files/kube-scheduler"
+  delegate_to: localhost
+  run_once: true
+
+- name: Copy kube-scheduler-key.pem
+  copy:
+    src: kube-scheduler-key.pem
+    dest: /etc/kubernetes/cert/kube-scheduler-key.pem
+    mode: 0755
+
+- name: Copy kube-scheduler.pem
+  copy:
+    src: kube-scheduler.pem
+    dest: /etc/kubernetes/cert/kube-scheduler.pem
+    mode: 0755
+
+- name: Generate kube-scheduler kubeconfig file | Set cluster
+  shell: "roles/kubectl/files/v1.14.2/kubectl config set-cluster kubernetes 
+  --certificate-authority=roles/cert/files/ca.pem 
+  --embed-certs=true 
+  --server={{ KUBE_APISERVER }} 
+  --kubeconfig=roles/kube-scheduler/files/kube-scheduler.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate kube-scheduler file | Set client credentials
+  shell: "roles/kubectl/files/v1.14.2/kubectl config set-credentials system:kube-scheduler   
+  --client-certificate=roles/kube-scheduler/files/kube-scheduler.pem 
+  --client-key=roles/kube-scheduler/files/kube-scheduler-key.pem 
+  --embed-certs=true 
+  --kubeconfig=roles/kube-scheduler/files/kube-scheduler.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate kube-scheduler file | Set context
+  shell: "roles/kubectl/files/v1.14.2/kubectl config set-context system:kube-scheduler   
+  --cluster=kubernetes 
+  --user=system:kube-scheduler  
+  --kubeconfig=roles/kube-scheduler/files/kube-scheduler.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate kube-scheduler file | Use context
+  shell: "roles/kubectl/files/v1.14.2/kubectl config use-context system:kube-scheduler 
+  --kubeconfig=roles/kube-scheduler/files/kube-scheduler.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Copy kube-scheduler.kubeconfig file
+  copy:
+    src: kube-scheduler.kubeconfig
+    dest: /etc/kubernetes/kube-scheduler.kubeconfig
+    mode: 0755
+
+- name: Copy kube-scheduler.yaml.template file
+  template:
+    src: kube-scheduler.yaml.template
+    dest: /etc/kubernetes/kube-scheduler.yaml
+    mode: 0755
+
+- name: Copy kube-scheduler.service.template file
+  template:
+    src: kube-scheduler.service.template
+    dest: /etc/systemd/system/kube-scheduler.service
+    mode: 0755
+
+- name: Mkdir {{ K8S_DIR }}/kube-scheduler
+  file:
+    path: "{{ K8S_DIR }}/kube-scheduler"
+    state: directory
+    mode: 0755
+
+- name: Just force systemd to reread configs (2.4 and above)
+  systemd:
+    daemon_reload: yes
+
+- name: Enable kube-scheduler service
+  systemd:
+    name: kube-scheduler
+    enabled: yes
+    masked: no
+
+- name: Restart kube-scheduler service
+  systemd:
+    state: restarted
+    name: kube-scheduler
+
+- name: Get kube-scheduler status
+  shell: "systemctl status kube-scheduler |grep 'Active:'"
+  register: kube_scheduler_status
+
+- name: Echo kube-scheduler status
+  debug:
+    msg: "{{ kube_scheduler_status.stdout }}"
+

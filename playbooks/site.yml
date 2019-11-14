@@ -8,3 +8,4 @@
 - include: master.yml
 - include: apiserver.yml
 - include: controller-manager.yml
+- include: kube-scheduler.yml
