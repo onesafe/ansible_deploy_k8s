@@ -5,3 +5,4 @@
 - include: etcd.yml
 - include: flannel.yml
 - include: kube-nginx.yml
+- include: master.yml
