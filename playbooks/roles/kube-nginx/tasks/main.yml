@@ -1,0 +1,56 @@
+- name: Mkdir /opt/k8s/kube-nginx/conf
+  file:
+    path: /opt/k8s/kube-nginx/conf
+    state: directory
+    mode: 0755
+
+- name: Mkdir /opt/k8s/kube-nginx/logs
+  file:
+    path: /opt/k8s/kube-nginx/logs
+    state: directory
+    mode: 0755
+
+- name: Mkdir /opt/k8s/kube-nginx/sbin
+  file:
+    path: /opt/k8s/kube-nginx/sbin
+    state: directory
+    mode: 0755
+
+- name: Copy compiled nginx bin
+  copy:
+    src: v1.15.3/nginx
+    dest: /opt/k8s/kube-nginx/sbin/kube-nginx
+    mode: 0755
+
+- name: Copy kube-nginx.conf
+  template:
+    src: kube-nginx.conf
+    dest: /opt/k8s/kube-nginx/conf/kube-nginx.conf
+
+- name: Copy kube-nginx.service
+  template:
+    src: kube-nginx.service
+    dest: /etc/systemd/system/kube-nginx.service
+
+- name: Just force systemd to reread configs (2.4 and above)
+  systemd:
+    daemon_reload: yes
+
+- name: Enable kube-nginx service
+  systemd:
+    name: kube-nginx
+    enabled: yes
+    masked: no
+
+- name: Restart kube-nginx service
+  systemd:
+    state: restarted
+    name: kube-nginx
+
+- name: Check kube-nginx status
+  shell: "systemctl status kube-nginx |grep 'Active:'"
+  register: kube_nginx_status
+
+- name: Echo kube-nginx status
+  debug:
+    msg: "{{ kube_nginx_status.stdout }}"
