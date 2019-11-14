@@ -64,6 +64,12 @@
     dest: /etc/systemd/system/kube-controller-manager.service
     mode: 0755
 
+- name: Mkdir {{ K8S_DIR }}/kube-controller-manager
+  file:
+    path: "{{ K8S_DIR }}/kube-controller-manager"
+    state: directory
+    mode: 0755
+
 - name: Just force systemd to reread configs (2.4 and above)
   systemd:
     daemon_reload: yes
