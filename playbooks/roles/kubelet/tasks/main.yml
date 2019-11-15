@@ -42,6 +42,7 @@
 - name: Grant clusterrole
   shell: "/opt/k8s/bin/kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --group=system:bootstrappers"
   run_once: true
+  ignore_errors: true
 
 - name: Mkdir {{ K8S_DIR }}/kubelet/kubelet-plugins/volume/exec
   file:

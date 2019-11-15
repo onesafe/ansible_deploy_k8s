@@ -94,3 +94,4 @@
 - name: Grant kube-apiserver rbac to access kubelet api
   shell: "/opt/k8s/bin/kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole=system:kubelet-api-admin --user kubernetes"
   run_once: true
+  ignore_errors: true

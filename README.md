@@ -18,8 +18,10 @@
 ## 使用
 `ansible-playbook -i inventory/hosts playbooks/site.yml`
 
-## 注意主机名字符串需要符合下面要求
-`a DNS-1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')"]`
+## 注意事项
+* `主机名字符串需要符合下面要求 (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')`
+
+* `下载kubernetes-server-linux-amd64.tar.gz文件，网速比较慢的话，可以注释掉roles/master/tasks/main.yml，手动先下载上传到节点/opt/k8s/work/路径下`
 
 ## 手动执行的命令
 ### 对kubelet server执行approve csr (playbooks/roles/kubelet)

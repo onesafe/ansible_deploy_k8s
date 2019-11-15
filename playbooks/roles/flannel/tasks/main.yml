@@ -44,6 +44,7 @@
   mk {{ FLANNEL_ETCD_PREFIX }}/config 
   '{\"Network\":\"{{ CLUSTER_CIDR }}\", \"SubnetLen\": 21, \"Backend\": {\"Type\": \"vxlan\"}}'"
   run_once: true
+  ignore_errors: true
 
 - name: Get flanneld network
   shell: "/opt/k8s/bin/etcdctl --endpoints={{ ETCD_ENDPOINTS }} 
