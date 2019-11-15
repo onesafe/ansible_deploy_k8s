@@ -33,4 +33,4 @@ playbooks/roles/kubectl/files/admin-key.pem
 playbooks/roles/kubectl/files/admin.csr
 playbooks/roles/kubectl/files/admin.pem
 playbooks/roles/kubectl/files/kubectl.kubeconfig
-
+playbooks/roles/dashboard/files/dashboard.kubeconfig

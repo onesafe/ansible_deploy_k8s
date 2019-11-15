@@ -37,3 +37,6 @@
 ## 手动执行的命令
 ### 对kubelet server执行approve csr (playbooks/roles/kubelet)
 `/opt/k8s/bin/kubectl get csr | grep Pending | awk '{print $1}' | xargs /opt/k8s/bin/kubectl certificate approve`
+
+## Dashboard
+![Dashboard](images/dashboard.jpg)
