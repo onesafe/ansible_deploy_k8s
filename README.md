@@ -1,5 +1,8 @@
 # 使用ansible部署kubernetes
 
+## Dashboard
+![Dashboard](images/dashboard.jpg)
+
 ## 依赖
 * `ansible 2.8.5`
 
@@ -38,5 +41,3 @@
 ### 对kubelet server执行approve csr (playbooks/roles/kubelet)
 `/opt/k8s/bin/kubectl get csr | grep Pending | awk '{print $1}' | xargs /opt/k8s/bin/kubectl certificate approve`
 
-## Dashboard
-![Dashboard](images/dashboard.jpg)
