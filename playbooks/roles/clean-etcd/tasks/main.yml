@@ -1,0 +1,14 @@
+- name: Stop process
+  shell: "systemctl stop etcd"
+
+- name: Delete etcd data dir
+  shell: "rm -rf {{ ETCD_DATA_DIR }} {{ ETCD_WAL_DIR }}"
+
+- name: Delete systemd unit files
+  shell: "rm -rf /etc/systemd/system/etcd.service"
+
+- name: Delete process
+  shell: "rm -rf /opt/k8s/bin/etcd"
+
+- name: Delete cert files
+  shell: "rm -rf /etc/etcd/cert"

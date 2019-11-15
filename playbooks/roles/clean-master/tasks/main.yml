@@ -1,0 +1,11 @@
+- name: Stop process
+  shell: "systemctl stop kube-apiserver kube-controller-manager kube-scheduler kube-nginx"
+
+- name: Delete systemd unit files
+  shell: "rm -rf /etc/systemd/system/{kube-apiserver,kube-controller-manager,kube-scheduler,kube-nginx}.service"
+
+- name: Delete process files
+  shell: "rm -rf /opt/k8s/bin/{kube-apiserver,kube-controller-manager,kube-scheduler}"
+
+- name: Delete cert files
+  shell: "rm -rf /etc/flanneld/cert /etc/kubernetes/cert"

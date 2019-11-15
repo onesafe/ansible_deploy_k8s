@@ -1,0 +1,34 @@
+- name: Stop process
+  shell: "systemctl stop kubelet kube-proxy flanneld docker kube-proxy kube-nginx"
+
+- name: Delete kubelet dir
+  shell: "rm -rf {{ K8S_DIR }}/kubelet"
+
+- name: Delete docker dir
+  shell: "rm -rf {{ DOCKER_DIR }}"
+
+- name: Delete flannel running dir
+  shell: "rm -rf /var/run/flannel"
+
+- name: Delete docker running dir
+  shell: "rm -rf /var/run/docker"
+
+- name: Delete systemd unit file
+  shell: "rm -rf /etc/systemd/system/{kubelet,docker,flanneld,kube-nginx}.service"
+
+- name: Delete process dir
+  shell: "rm -rf /opt/k8s/bin"
+
+- name: Delete cert
+  shell: "rm -rf /etc/flanneld/cert /etc/kubernetes/cert"
+
+- name: Clean iptables
+  shell: "iptables -F && iptables -X && iptables -F -t nat && iptables -X -t nat"
+
+- name: Delete flanneld bridge
+  shell: "ip link del flannel.1"
+  ignore_errors: true
+
+- name: Delete docker bridge
+  shell: "ip link del docker0"
+  ignore_errors: true

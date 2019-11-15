@@ -15,8 +15,11 @@
 ## 升级内核 (Centos7 自带的内核使用k8s有一些bug)
 `ansible-playbook -i inventory/hosts playbooks/kernel.yml`
 
-## 使用
+## 部署集群
 `ansible-playbook -i inventory/hosts playbooks/site.yml`
+
+## 清理集群
+`ansible-playbook -i inventory/hosts playbooks/clean.yml`
 
 ## 注意事项
 * `主机名字符串需要符合下面要求 (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')`

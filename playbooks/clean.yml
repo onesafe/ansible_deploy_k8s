@@ -1,0 +1,4 @@
+---
+- include: clean-node.yml
+- include: clean-master.yml
+- include: clean-etcd.yml
