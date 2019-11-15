@@ -12,3 +12,4 @@
 - include: docker.yml
 - include: kubelet.yml
 - include: kube-proxy.yml
+- include: coredns.yml

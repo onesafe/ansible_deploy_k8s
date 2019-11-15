@@ -1,0 +1,5 @@
+---
+- hosts: k8s_node
+  gather_facts: false
+  roles:
+  - coredns

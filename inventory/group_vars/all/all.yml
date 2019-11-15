@@ -3,6 +3,8 @@ k8s01: 172.27.129.68
 k8s02: 172.27.129.69
 k8s03: 172.27.129.70
 
+GCR_PROXY: "gcr.azk8s.cn/google_containers"
+
 # kube-apiserver 的反向代理(kube-nginx)地址端口
 KUBE_APISERVER: "https://127.0.0.1:8443"
 
