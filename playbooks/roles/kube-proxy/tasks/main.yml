@@ -1,0 +1,110 @@
+- name: Generate kube-proxy certificate
+  shell: "roles/cert/bin/cfssl gencert 
+  -ca=roles/cert/files/ca.pem 
+  -ca-key=roles/cert/files/ca-key.pem 
+  -config=roles/cert/files/ca-config.json
+  -profile=kubernetes roles/kube-proxy/files/kube-proxy-csr.json | 
+  roles/cert/bin/cfssljson -bare roles/kube-proxy/files/kube-proxy"
+  delegate_to: localhost
+  run_once: true
+
+- name: Copy kube-proxy-key.pem
+  copy:
+    src: kube-proxy-key.pem
+    dest: /etc/kubernetes/cert/kube-proxy-key.pem
+    mode: 0755
+
+- name: Copy kube-proxy.pem
+  copy:
+    src: kube-proxy.pem
+    dest: /etc/kubernetes/cert/kube-proxy.pem
+    mode: 0755
+
+- name: Generate kube-proxy kubeconfig file | Set cluster
+  shell: "roles/kubectl/files/v1.14.2/kubectl config set-cluster kubernetes 
+  --certificate-authority=roles/cert/files/ca.pem 
+  --embed-certs=true 
+  --server={{ KUBE_APISERVER }} 
+  --kubeconfig=roles/kube-proxy/files/kube-proxy.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate kube-proxy file | Set client credentials
+  shell: "roles/kubectl/files/v1.14.2/kubectl config set-credentials system:kube-proxy  
+  --client-certificate=roles/kube-proxy/files/kube-proxy.pem 
+  --client-key=roles/kube-proxy/files/kube-proxy-key.pem 
+  --embed-certs=true 
+  --kubeconfig=roles/kube-proxy/files/kube-proxy.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate kube-proxy file | Set context
+  shell: "roles/kubectl/files/v1.14.2/kubectl config set-context default   
+  --cluster=kubernetes 
+  --user=system:kube-proxy  
+  --kubeconfig=roles/kube-proxy/files/kube-proxy.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate kube-proxy file | Use context
+  shell: "roles/kubectl/files/v1.14.2/kubectl config use-context default  
+  --kubeconfig=roles/kube-proxy/files/kube-proxy.kubeconfig"
+  delegate_to: localhost
+  run_once: true
+
+- name: Copy kube-proxy.kubeconfig file
+  copy:
+    src: kube-proxy.kubeconfig
+    dest: /etc/kubernetes/kube-proxy.kubeconfig
+    mode: 0755
+
+- name: Copy kube-proxy-config.yaml.template
+  template:
+    src: kube-proxy-config.yaml.template
+    dest: /etc/kubernetes/kube-proxy-config.yaml
+
+- name: Copy kube-proxy.service.template file
+  template:
+    src: kube-proxy.service.template
+    dest: /etc/systemd/system/kube-proxy.service
+    mode: 0755
+
+- name: Mkdir {{ K8S_DIR }}/kube-proxy
+  file:
+    path: "{{ K8S_DIR }}/kube-proxy"
+    state: directory
+    mode: 0755
+
+- name: Modprobe ip_vs_rr
+  shell: "modprobe ip_vs_rr"
+
+- name: Just force systemd to reread configs (2.4 and above)
+  systemd:
+    daemon_reload: yes
+
+- name: Enable kube-proxy service
+  systemd:
+    name: kube-proxy
+    enabled: yes
+    masked: no
+
+- name: Restart kube-proxy service
+  systemd:
+    state: restarted
+    name: kube-proxy
+
+- name: Get kube-proxy status
+  shell: "systemctl status kube-proxy |grep 'Active:'"
+  register: kube_controller_manager_status
+
+- name: Echo kube-proxy 
+  debug:
+    msg: "{{ kube_controller_manager_status.stdout }}"
+
+- name: Get ipvs route rule
+  shell: "/usr/sbin/ipvsadm -ln"
+  register: ipvs_route_rule
+
+- name: Echo ipvs route rule
+  debug:
+    msg: "{{ ipvs_route_rule.stdout }}"

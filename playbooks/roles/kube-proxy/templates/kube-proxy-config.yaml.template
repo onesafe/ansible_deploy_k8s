@@ -1,0 +1,19 @@
+kind: KubeProxyConfiguration
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+clientConnection:
+  burst: 200
+  kubeconfig: "/etc/kubernetes/kube-proxy.kubeconfig"
+  qps: 100
+bindAddress: {{ ansible_host }}
+healthzBindAddress: {{ ansible_host }}:10256
+metricsBindAddress: {{ ansible_host }}:10249
+enableProfiling: true
+clusterCIDR: {{ CLUSTER_CIDR }}
+hostnameOverride: {{ inventory_hostname }}
+mode: "ipvs"
+portRange: ""
+kubeProxyIPTablesConfiguration:
+  masqueradeAll: false
+kubeProxyIPVSConfiguration:
+  scheduler: rr
+  excludeCIDRs: []

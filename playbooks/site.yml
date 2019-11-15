@@ -11,3 +11,4 @@
 - include: kube-scheduler.yml
 - include: docker.yml
 - include: kubelet.yml
+- include: kube-proxy.yml
