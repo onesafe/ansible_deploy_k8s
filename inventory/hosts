@@ -16,8 +16,8 @@ wyp_k8s02
 wyp_k8s03
 
 [k8s_node]
-wyp_k8s03
-wyp_k8s03
+wyp_k8s01
+wyp_k8s02
 wyp_k8s03
 
 [k8s_cluster:children]

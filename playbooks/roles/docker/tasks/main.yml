@@ -1,0 +1,121 @@
+- name: Copy docker containerd file
+  copy:
+    src: v1.18.09.6/docker/containerd
+    dest: /opt/k8s/bin/
+    mode: 0755
+
+- name: Copy docker containerd-shim file
+  copy:
+    src: v1.18.09.6/docker/containerd-shim
+    dest: /opt/k8s/bin/
+    mode: 0755
+
+- name: Copy docker ctr file
+  copy:
+    src: v1.18.09.6/docker/ctr
+    dest: /opt/k8s/bin/
+    mode: 0755
+
+- name: Copy docker docker file
+  copy:
+    src: v1.18.09.6/docker/docker
+    dest: /opt/k8s/bin/
+    mode: 0755
+
+- name: Copy docker docker-init file
+  copy:
+    src: v1.18.09.6/docker/docker-init
+    dest: /opt/k8s/bin/
+    mode: 0755
+
+- name: Copy docker docker-proxy file
+  copy:
+    src: v1.18.09.6/docker/docker-proxy
+    dest: /opt/k8s/bin/
+    mode: 0755
+
+- name: Copy docker dockerd file
+  copy:
+    src: v1.18.09.6/docker/dockerd
+    dest: /opt/k8s/bin/
+    mode: 0755
+
+- name: Copy docker runc file
+  copy:
+    src: v1.18.09.6/docker/runc
+    dest: /opt/k8s/bin/
+    mode: 0755
+
+- name: Mkdir {{ DOCKER_DIR }}
+  file:
+    path: "{{ DOCKER_DIR }}"
+    state: directory
+    mode: 0755
+
+- name: Copy docker.service.template file
+  template:
+    src: docker.service.template
+    dest: /etc/systemd/system/docker.service
+    mode: 0755
+
+- name: Iptables FORWARD chain ACCEPT
+  shell: "iptables -P FORWARD ACCEPT"
+
+- name: Iptables /etc/rc.local
+  shell: "/sbin/iptables -P FORWARD ACCEPT"
+
+- name: Mkdir {{ DOCKER_DIR }}/data
+  file:
+    path: "{{ DOCKER_DIR }}/data"
+    state: directory
+    mode: 0755
+
+- name: Mkdir {{ DOCKER_DIR }}/exec
+  file:
+    path: "{{ DOCKER_DIR }}/exec"
+    state: directory
+    mode: 0755
+
+- name: Mkdir /etc/docker
+  file:
+    path: /etc/docker
+    state: directory
+    mode: 0755
+
+- name: Copy docker-daemon.json file
+  template:
+    src: docker-daemon.json
+    dest: /etc/docker/daemon.json
+    mode: 0755
+
+- name: Just force systemd to reread configs (2.4 and above)
+  systemd:
+    daemon_reload: yes
+
+- name: Enable docker service
+  systemd:
+    name: docker
+    enabled: yes
+    masked: no
+
+- name: Restart docker service
+  systemd:
+    state: restarted
+    name: docker
+
+- name: Get docker status
+  shell: "systemctl status docker |grep 'Active:'"
+  register: docker_status
+
+- name: Echo docker status
+  debug:
+    msg: "{{ docker_status.stdout }}"
+
+- name: Get docker0 and flannel.1
+  shell: "/usr/sbin/ip addr show flannel.1 && /usr/sbin/ip addr show docker0"
+  register: docker0_flannel_1
+
+- name: Echo docker0 and flannel.1
+  debug:
+    msg: "{{ docker0_flannel_1.stdout }}"
+
