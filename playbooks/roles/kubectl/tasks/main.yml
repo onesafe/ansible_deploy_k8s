@@ -56,3 +56,15 @@
     src: kubectl.kubeconfig
     dest: ~/.kube/config
     mode: 0755
+
+- name: Copy admin-key.pem
+  copy:
+    src: admin-key.pem
+    dest: /etc/kubernetes/cert/admin-key.pem
+    mode: 0755
+
+- name: Copy admin.pem
+  copy:
+    src: admin.pem
+    dest: /etc/kubernetes/cert/admin.pem
+    mode: 0755

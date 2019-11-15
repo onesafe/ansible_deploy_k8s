@@ -1,0 +1,98 @@
+- name: Generate bootstrap token
+  shell: "/opt/k8s/bin/kubeadm token create --description kubelet-bootstrap-token --groups system:bootstrappers:{{ inventory_hostname }} --kubeconfig ~/.kube/config"
+  register: "bootstrap_token"
+
+- name: Echo bootstrap token
+  debug:
+    msg: "{{ bootstrap_token.stdout }}"
+
+- name: Set cluster 
+  shell: "/opt/k8s/bin/kubectl config set-cluster kubernetes 
+  --certificate-authority=/etc/kubernetes/cert/ca.pem --embed-certs=true 
+  --server={{ KUBE_APISERVER }} 
+  --kubeconfig=/etc/kubernetes/kubelet-bootstrap.kubeconfig"
+
+- name: Set client credentials
+  shell: "/opt/k8s/bin/kubectl config set-credentials kubelet-bootstrap 
+  --token={{ bootstrap_token.stdout }}  
+  --kubeconfig=/etc/kubernetes/kubelet-bootstrap.kubeconfig"
+
+- name: Set context
+  shell: "/opt/k8s/bin/kubectl config set-context default   
+  --cluster=kubernetes 
+  --user=kubelet-bootstrap   
+  --kubeconfig=/etc/kubernetes/kubelet-bootstrap.kubeconfig"
+
+- name: Use context
+  shell: "/opt/k8s/bin/kubectl config use-context default   
+  --kubeconfig=/etc/kubernetes/kubelet-bootstrap.kubeconfig"
+
+- name: Copy kubelet-config.yaml.template file
+  template:
+    src: kubelet-config.yaml.template
+    dest: /etc/kubernetes/kubelet-config.yaml
+    mode: 0755
+
+- name: Copy kubelet.service.template file
+  template:
+    src: kubelet.service.template
+    dest: /etc/systemd/system/kubelet.service
+    mode: 0755
+
+- name: Grant clusterrole
+  shell: "/opt/k8s/bin/kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --group=system:bootstrappers"
+  run_once: true
+
+- name: Mkdir {{ K8S_DIR }}/kubelet/kubelet-plugins/volume/exec
+  file:
+    path: "{{ K8S_DIR }}/kubelet/kubelet-plugins/volume/exec"
+    state: directory
+    mode: 0755
+
+- name: Swap off
+  shell: "/usr/sbin/swapoff -a"
+
+- name: Just force systemd to reread configs (2.4 and above)
+  systemd:
+    daemon_reload: yes
+
+- name: Enable kubelet service
+  systemd:
+    name: kubelet
+    enabled: yes
+    masked: no
+
+- name: Restart kubelet service
+  systemd:
+    state: restarted
+    name: kubelet
+
+- name: Get kubelet status
+  shell: "systemctl status kubelet |grep 'Active:'"
+  register: kubelet_status
+
+- name: Echo kubelet status
+  debug:
+    msg: "{{ kubelet_status.stdout }}"
+
+- name: Copy csr-crb.yaml
+  copy:
+    src: csr-crb.yaml
+    dest: /etc/kubernetes/csr-crb.yaml
+    mode: 0755
+
+- name: Kubectl apply csr-crb.yaml
+  shell: "/opt/k8s/bin/kubectl apply -f /etc/kubernetes/csr-crb.yaml"
+  run_once: true
+
+## 这里需要等待几分钟，然后手动对kubelet server执行approve csr (CSR approving controllers 不会自动 approve kubelet server 证书签名请求，需要手动 approve)
+# - name: Approve csr by your hand after wait a few mins
+#   shell: "/opt/k8s/bin/kubectl get csr | grep Pending | awk '{print $1}' | xargs /opt/k8s/bin/kubectl certificate approve"
+
+- name: Use cert access kubelet api
+  shell: "curl -s --cacert /etc/kubernetes/cert/ca.pem --cert /etc/kubernetes/cert/admin.pem --key /etc/kubernetes/cert/admin-key.pem https://{{ ansible_host }}:10250/metrics|head"
+  register: kubelet_metric_result
+
+- name: Echo kubelet metric api result
+  debug:
+    msg: "{{ kubelet_metric_result.stdout }}"

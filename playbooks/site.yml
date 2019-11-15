@@ -10,3 +10,4 @@
 - include: controller-manager.yml
 - include: kube-scheduler.yml
 - include: docker.yml
+- include: kubelet.yml
