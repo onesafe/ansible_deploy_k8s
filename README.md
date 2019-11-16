@@ -6,7 +6,7 @@
 ## 依赖
 * `ansible 2.8.5`
 
-## 修改主机名和IP
+## 前提条件（修改下面七个文件的主机名和IP）
 * `inventory/hosts`
 * `inventory/group_vars/all/all.yml`
 * `playbooks/roles/prepare/templates/hosts` 
@@ -15,16 +15,13 @@
 * `playbooks/roles/controller-manager/files/kube-controller-manager-csr.json`
 * `playbooks/roles/kube-scheduler/files/kube-scheduler-csr.json`
 
-## 升级内核 (Centos7 自带的内核使用k8s有一些bug)
-`ansible-playbook -i inventory/hosts playbooks/kernel.yml`
-
 ## 部署集群 (v1.14.2版本的kubernetes)
 `ansible-playbook -i inventory/hosts playbooks/site.yml`
 
 ##### 需要关注两个点
-* 下载kubernetes-server-linux-amd64.tar.gz文件慢的话，详情见注意事项
+* 下载kubernetes-server-linux-amd64.tar.gz文件慢的话（playbooks/roles/master），详情见注意事项
 
-* 部署完成后需要执行（这个需要等待token的csr Approved，所以在ansible里面就不等待了，最后我们手动执行）
+* 部署完成后需要登录节点执行（这个需要等待token的csr Approved，所以在ansible的playbooks/roles/kubelet里面就不等待了，最后我们手动执行）
 `/opt/k8s/bin/kubectl get csr | grep Pending | awk '{print $1}' | xargs /opt/k8s/bin/kubectl certificate approve`
 
 ## 清理集群
@@ -36,8 +33,5 @@
 
 * `下载kubernetes-server-linux-amd64.tar.gz文件，网速比较慢的话，可以注释掉roles/master/tasks/main.yml，手动先下载上传到节点/opt/k8s/work/路径下`
 
-
-## 手动执行的命令
-### 对kubelet server执行approve csr (playbooks/roles/kubelet)
-`/opt/k8s/bin/kubectl get csr | grep Pending | awk '{print $1}' | xargs /opt/k8s/bin/kubectl certificate approve`
-
+## 升级内核 (Centos7 自带的内核使用k8s有一些bug)
+`ansible-playbook -i inventory/hosts playbooks/kernel.yml`
