@@ -1,5 +1,14 @@
 - name: Stop process
   shell: "systemctl stop kubelet kube-proxy flanneld docker kube-proxy kube-nginx"
+  ignore_errors: true
+
+- name: Delete coredns deploy
+  shell: "/opt/k8s/bin/kubectl delete deploy coredns  -n kube-system"
+  ignore_errors: true
+
+- name: Delete kubernetes-dashboard deploy
+  shell: "/opt/k8s/bin/kubectl delete deploy kubernetes-dashboard  -n kube-system"
+  ignore_errors: true
 
 - name: Delete kubelet dir
   shell: "rm -rf {{ K8S_DIR }}/kubelet"

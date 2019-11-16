@@ -1,3 +1,3 @@
-{{ k8s01 }} wyp-k8s01
-{{ k8s02 }} wyp-k8s02
-{{ k8s03 }} wyp-k8s03
+{{ k8s01 }} {{ host1 }}
+{{ k8s02 }} {{ host2 }}
+{{ k8s03 }} {{ host3 }}

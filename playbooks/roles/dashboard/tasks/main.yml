@@ -1,33 +1,33 @@
-# - name: Copy dashboard-service.yaml file
-#   copy:
-#     src: dashboard-service.yaml
-#     dest: /opt/k8s/work/kubernetes/cluster/addons/dashboard/dashboard-service.yaml
-#     mode: 0755
+- name: Copy dashboard-service.yaml file
+  copy:
+    src: dashboard-service.yaml
+    dest: /opt/k8s/work/kubernetes/cluster/addons/dashboard/dashboard-service.yaml
+    mode: 0755
 
-# - name: Use gcr proxy to pull gcr.io image
-#   shell: 'sed -i -e "s@k8s.gcr.io@{{ GCR_PROXY }}@" /opt/k8s/work/kubernetes/cluster/addons/dashboard/dashboard-controller.yaml' 
+- name: Use gcr proxy to pull gcr.io image
+  shell: 'sed -i -e "s@k8s.gcr.io@{{ GCR_PROXY }}@" /opt/k8s/work/kubernetes/cluster/addons/dashboard/dashboard-controller.yaml' 
 
-# - name: Kubectl create dashboard
-#   shell: "/opt/k8s/bin/kubectl apply -f /opt/k8s/work/kubernetes/cluster/addons/dashboard"
-#   run_once: true
+- name: Kubectl create dashboard
+  shell: "/opt/k8s/bin/kubectl apply -f /opt/k8s/work/kubernetes/cluster/addons/dashboard"
+  run_once: true
 
-# - name: Get dashboard NodePort
-#   shell: "/opt/k8s/bin/kubectl get svc -n kube-system | grep dashboard | awk '{print $5}'"
-#   register: dashboard_node_port
-#   run_once: true
+- name: Get dashboard NodePort
+  shell: "/opt/k8s/bin/kubectl get svc -n kube-system | grep dashboard | awk '{print $5}'"
+  register: dashboard_node_port
+  run_once: true
 
-# - name: Echo dashboard NodePort
-#   debug:
-#     msg: "{{ dashboard_node_port.stdout }}"
-#   run_once: true
+- name: Echo dashboard NodePort
+  debug:
+    msg: "{{ dashboard_node_port.stdout }}"
+  run_once: true
 
-# - name: Generate token | create sa
-#   shell: "/opt/k8s/bin/kubectl create sa dashboard-admin -n kube-system"
-#   run_once: true
+- name: Generate token | create sa
+  shell: "/opt/k8s/bin/kubectl create sa dashboard-admin -n kube-system"
+  run_once: true
 
-# - name: Generate token | create clusterrolebinding
-#   shell: "/opt/k8s/bin/kubectl create clusterrolebinding dashboard-admin --clusterrole=cluster-admin --serviceaccount=kube-system:dashboard-admin"
-#   run_once: true
+- name: Generate token | create clusterrolebinding
+  shell: "/opt/k8s/bin/kubectl create clusterrolebinding dashboard-admin --clusterrole=cluster-admin --serviceaccount=kube-system:dashboard-admin"
+  run_once: true
 
 - name: Generate token | get secret
   shell: "/opt/k8s/bin/kubectl get secrets -n kube-system | grep dashboard-admin | awk '{print $1}'"

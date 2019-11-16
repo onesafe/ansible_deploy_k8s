@@ -1,5 +1,6 @@
 - name: Stop process
   shell: "systemctl stop kube-apiserver kube-controller-manager kube-scheduler kube-nginx"
+  ignore_errors: true
 
 - name: Delete systemd unit files
   shell: "rm -rf /etc/systemd/system/{kube-apiserver,kube-controller-manager,kube-scheduler,kube-nginx}.service"

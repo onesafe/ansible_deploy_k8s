@@ -1,5 +1,6 @@
 - name: Stop process
   shell: "systemctl stop etcd"
+  ignore_errors: true
 
 - name: Delete etcd data dir
   shell: "rm -rf {{ ETCD_DATA_DIR }} {{ ETCD_WAL_DIR }}"

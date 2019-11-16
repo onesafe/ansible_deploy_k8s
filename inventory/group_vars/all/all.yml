@@ -1,37 +1,36 @@
 ---
+# k8s01, k8s02, k8s03 不用改，只需要把IP变了就行
 k8s01: 172.27.129.68
 k8s02: 172.27.129.69
 k8s03: 172.27.129.70
 
+# host1, host2, host3 不用改，只需要把主机名改了就行
+host1: wyp-k8s01
+host2: wyp-k8s02
+host3: wyp-k8s03
+
+# --------------------------------------------------------------
+
 GCR_PROXY: "gcr.azk8s.cn/google_containers"
 
-# kube-apiserver 的反向代理(kube-nginx)地址端口
-KUBE_APISERVER: "https://127.0.0.1:8443"
-
-# etcd 数据目录
-ETCD_DATA_DIR: "/data/k8s/etcd/data"
-
-# etcd WAL 目录，建议是 SSD 磁盘分区，或者和 ETCD_DATA_DIR 不同的磁盘分区
-ETCD_WAL_DIR: "/data/k8s/etcd/wal"
-
 # etcd 集群间通信的 IP 和端口
-ETCD_NODES: "wyp-k8s01=https://172.27.129.68:2380,wyp-k8s02=https://172.27.129.69:2380,wyp-k8s03=https://172.27.129.70:2380"
+ETCD_NODES: "{{ host1 }}=https://{{ k8s01 }}:2380,{{ host2 }}=https://{{ k8s02 }}:2380,{{ host3 }}=https://{{ k8s03 }}:2380"
+
+# 集群各机器 IP 数组
+# NODE_IPS: (172.27.129.68 172.27.129.69 172.27.129.70)
+
+# 集群各 IP 对应的主机名数组
+# NODE_NAMES: (wyp-k8s01 wyp-k8s02 wyp-k8s03)
+
+# etcd 集群服务地址列表
+ETCD_ENDPOINTS: "https://{{ k8s01 }}:2379,https://{{ k8s02 }}:2379,https://{{ k8s03 }}:2379"
+
+# 节点间互联网络接口名称
+IFACE: "eth0"
 
 # 生成 EncryptionConfig 所需的加密 key
 # ENCRYPTION_KEY: $(head -c 32 /dev/urandom | base64)
 ENCRYPTION_KEY: HqZI+SHQbYPR+sB3ev5MGtvFHxfGiWeqAOxDqIe4D3Y=
-
-# 集群各机器 IP 数组
-NODE_IPS: (172.27.129.68 172.27.129.69 172.27.129.70)
-
-# 集群各 IP 对应的主机名数组
-NODE_NAMES: (wyp-k8s01 wyp-k8s02 wyp-k8s03)
-
-# etcd 集群服务地址列表
-ETCD_ENDPOINTS: "https://172.27.129.68:2379,https://172.27.129.69:2379,https://172.27.129.70:2379"
-
-# 节点间互联网络接口名称
-IFACE: "eth0"
 
 # k8s 各组件数据目录
 K8S_DIR: "/data/k8s/k8s"
@@ -39,7 +38,18 @@ K8S_DIR: "/data/k8s/k8s"
 # docker 数据目录
 DOCKER_DIR: "/data/k8s/docker"
 
+# etcd 数据目录
+ETCD_DATA_DIR: "/data/k8s/etcd/data"
+
+# etcd WAL 目录，建议是 SSD 磁盘分区，或者和 ETCD_DATA_DIR 不同的磁盘分区
+ETCD_WAL_DIR: "/data/k8s/etcd/wal"
+
+
+
 ## 以下参数一般不需要修改
+
+# kube-apiserver 的反向代理(kube-nginx)地址端口
+KUBE_APISERVER: "https://127.0.0.1:8443"
 
 # TLS Bootstrapping 使用的 Token，可以使用命令 head -c 16 /dev/urandom | od -An -t x | tr -d ' ' 生成
 BOOTSTRAP_TOKEN: "41f7e4ba8b7be874fcff18bf5cf41a7c"
