@@ -13,4 +13,4 @@
 - include: kubelet.yml
 - include: kube-proxy.yml
 - include: coredns.yml
-- include: dashboard.ml
+- include: dashboard.yml

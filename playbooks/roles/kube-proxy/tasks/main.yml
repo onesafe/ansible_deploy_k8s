@@ -95,11 +95,15 @@
 
 - name: Get kube-proxy status
   shell: "systemctl status kube-proxy |grep 'Active:'"
-  register: kube_controller_manager_status
+  register: kube_proxy_status
+  tags: 
+    - "status"
 
 - name: Echo kube-proxy 
   debug:
-    msg: "{{ kube_controller_manager_status.stdout }}"
+    msg: "{{ kube_proxy_status.stdout }}"
+  tags: 
+    - "status"
 
 - name: Get ipvs route rule
   shell: "/usr/sbin/ipvsadm -ln"

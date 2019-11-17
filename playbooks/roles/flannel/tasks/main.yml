@@ -84,17 +84,25 @@
   --key-file=/etc/flanneld/cert/flanneld-key.pem ls {{ FLANNEL_ETCD_PREFIX }}/subnets"
   run_once: true
   register: flanneld_subnet_res
+  tags: 
+    - "status"
 
 - name: Echo flanneld subnet
   debug:
     msg: "{{ flanneld_subnet_res.stdout }}"
   run_once: true
+  tags: 
+    - "status"
 
 - name: Ip show flannel.1
   shell: "ip addr show flannel.1|grep -w inet"
   register: ip_show_res
+  tags: 
+    - "status"
 
 - name: Echo ip show flannel.1 inet
   debug:
     msg: "{{ ip_show_res.stdout }}"
+  tags: 
+    - "status"
 

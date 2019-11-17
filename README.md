@@ -24,6 +24,9 @@
 * 部署完成后需要登录节点执行（这个需要等待token的csr Approved，所以在ansible的playbooks/roles/kubelet里面就不等待了，最后我们手动执行）
 `/opt/k8s/bin/kubectl get csr | grep Pending | awk '{print $1}' | xargs /opt/k8s/bin/kubectl certificate approve`
 
+## 查看集群服务状态
+`ansible-playbook -i inventory/hosts playbooks/site.yml --tags "status"`
+
 ## 清理集群
 在同一套环境里面部署多次的话，可以先清理集群
 `ansible-playbook -i inventory/hosts playbooks/clean.yml`

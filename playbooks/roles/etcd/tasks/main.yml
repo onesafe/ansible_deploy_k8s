@@ -75,10 +75,14 @@
   --cacert=/etc/kubernetes/cert/ca.pem --cert=/etc/etcd/cert/etcd.pem 
   --key=/etc/etcd/cert/etcd-key.pem endpoint health"
   register: etcd_health_res
+  tags: 
+    - "status"
 
 - name: Echo etcd health result
   debug:
     msg: "{{ etcd_health_res.stdout }}"
+  tags: 
+    - "status"
 
 - name: Get etcd leader
   shell: "ETCDCTL_API=3 /opt/k8s/bin/etcdctl -w table --cacert=/etc/kubernetes/cert/ca.pem 
@@ -86,8 +90,12 @@
   --endpoints={{ ETCD_ENDPOINTS }} endpoint status "
   register: etcd_leader_res
   run_once: true
+  tags: 
+    - "status"
 
 - name: Echo etcd leader
   debug:
     msg: "{{ etcd_leader_res.stdout }}"
   run_once: true
+  tags: 
+    - "status"

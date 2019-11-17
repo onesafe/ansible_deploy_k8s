@@ -106,16 +106,24 @@
 - name: Get docker status
   shell: "systemctl status docker |grep 'Active:'"
   register: docker_status
+  tags: 
+    - "status"
 
 - name: Echo docker status
   debug:
     msg: "{{ docker_status.stdout }}"
+  tags: 
+    - "status"
 
 - name: Get docker0 and flannel.1
   shell: "/usr/sbin/ip addr show flannel.1 && /usr/sbin/ip addr show docker0"
   register: docker0_flannel_1
+  tags: 
+    - "status"
 
 - name: Echo docker0 and flannel.1
   debug:
     msg: "{{ docker0_flannel_1.stdout }}"
+  tags: 
+    - "status"
 

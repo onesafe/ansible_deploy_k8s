@@ -71,10 +71,14 @@
 - name: Get kubelet status
   shell: "systemctl status kubelet |grep 'Active:'"
   register: kubelet_status
+  tags: 
+    - "status"
 
 - name: Echo kubelet status
   debug:
     msg: "{{ kubelet_status.stdout }}"
+  tags: 
+    - "status"
 
 - name: Copy csr-crb.yaml
   copy:

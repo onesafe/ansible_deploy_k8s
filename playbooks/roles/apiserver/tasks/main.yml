@@ -78,10 +78,14 @@
 - name: Get kube-apiserver status
   shell: "systemctl status kube-apiserver |grep 'Active:'"
   register: kube_apiserver_status
+  tags: 
+    - "status"
 
-- name: Echo kube-apiserver subnet
+- name: Echo kube-apiserver status
   debug:
     msg: "{{ kube_apiserver_status.stdout }}"
+  tags: 
+    - "status"
 
 - name: Get kube-apiserver etcd data
   shell: "ETCDCTL_API=3 /opt/k8s/bin/etcdctl --endpoints={{ ETCD_ENDPOINTS }} --cacert=/etc/kubernetes/cert/ca.pem --cert=/etc/etcd/cert/etcd.pem --key=/etc/etcd/cert/etcd-key.pem get /registry/ --prefix --keys-only"

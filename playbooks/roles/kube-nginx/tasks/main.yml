@@ -50,7 +50,11 @@
 - name: Check kube-nginx status
   shell: "systemctl status kube-nginx |grep 'Active:'"
   register: kube_nginx_status
+  tags: 
+    - "status"
 
 - name: Echo kube-nginx status
   debug:
     msg: "{{ kube_nginx_status.stdout }}"
+  tags: 
+    - "status"

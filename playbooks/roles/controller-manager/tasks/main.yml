@@ -88,8 +88,12 @@
 - name: Get kube-controller-manager status
   shell: "systemctl status kube-controller-manager |grep 'Active:'"
   register: kube_controller_manager_status
+  tags: 
+    - "status"
 
 - name: Echo kube-controller-manager 
   debug:
     msg: "{{ kube_controller_manager_status.stdout }}"
+  tags: 
+    - "status"
 

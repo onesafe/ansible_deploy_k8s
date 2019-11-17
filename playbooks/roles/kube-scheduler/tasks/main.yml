@@ -94,8 +94,12 @@
 - name: Get kube-scheduler status
   shell: "systemctl status kube-scheduler |grep 'Active:'"
   register: kube_scheduler_status
+  tags: 
+    - "status"
 
 - name: Echo kube-scheduler status
   debug:
     msg: "{{ kube_scheduler_status.stdout }}"
+  tags: 
+    - "status"
 
