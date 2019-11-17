@@ -6,7 +6,7 @@
 ## 依赖
 * `ansible 2.8.5`
 
-## 前提条件（修改下面七个文件的主机名和IP）
+## 前提条件（修改下面八个文件的主机名和IP）
 * `inventory/hosts`
 * `inventory/group_vars/all/all.yml`
 * `playbooks/roles/prepare/templates/hosts` 
@@ -14,6 +14,7 @@
 * `playbooks/roles/kube-nginx/templates/kube-nginx.conf`
 * `playbooks/roles/controller-manager/files/kube-controller-manager-csr.json`
 * `playbooks/roles/kube-scheduler/files/kube-scheduler-csr.json`
+* `playbooks/roles/apiserver/files/kubernetes-csr.json`
 
 ## 部署集群 (v1.14.2版本的kubernetes)
 `ansible-playbook -i inventory/hosts playbooks/site.yml`
