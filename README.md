@@ -30,6 +30,7 @@
 
 ## 清理集群
 在同一套环境里面部署多次的话，可以先清理集群
+
 `ansible-playbook -i inventory/hosts playbooks/clean.yml`
 
 ## 注意事项
