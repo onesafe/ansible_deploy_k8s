@@ -9,24 +9,30 @@ host1: wyp-k8s01
 host2: wyp-k8s02
 host3: wyp-k8s03
 
-# --------------------------------------------------------------
+# 集群各机器 IP 数组
+NODE_IPS: 172.27.129.68, 172.27.129.69, 172.27.129.70
 
-GCR_PROXY: "gcr.azk8s.cn/google_containers"
+# 集群各 IP 对应的主机名数组
+NODE_NAMES: wyp-k8s01, wyp-k8s02, wyp-k8s03
+
 
 # etcd 集群间通信的 IP 和端口
 ETCD_NODES: "{{ host1 }}=https://{{ k8s01 }}:2380,{{ host2 }}=https://{{ k8s02 }}:2380,{{ host3 }}=https://{{ k8s03 }}:2380"
 
-# 集群各机器 IP 数组
-# NODE_IPS: (172.27.129.68 172.27.129.69 172.27.129.70)
-
-# 集群各 IP 对应的主机名数组
-# NODE_NAMES: (wyp-k8s01 wyp-k8s02 wyp-k8s03)
-
 # etcd 集群服务地址列表
 ETCD_ENDPOINTS: "https://{{ k8s01 }}:2379,https://{{ k8s02 }}:2379,https://{{ k8s03 }}:2379"
 
+
+
+
+## 以下参数可以看情况修改
+# --------------------------------------------------------------
+
 # 节点间互联网络接口名称
 IFACE: "eth0"
+
+# 微软提供的代理
+GCR_PROXY: "gcr.azk8s.cn/google_containers"
 
 # 生成 EncryptionConfig 所需的加密 key
 # ENCRYPTION_KEY: $(head -c 32 /dev/urandom | base64)
@@ -47,6 +53,7 @@ ETCD_WAL_DIR: "/data/k8s/etcd/wal"
 
 
 ## 以下参数一般不需要修改
+# --------------------------------------------------------------
 
 # kube-apiserver 的反向代理(kube-nginx)地址端口
 KUBE_APISERVER: "https://127.0.0.1:8443"

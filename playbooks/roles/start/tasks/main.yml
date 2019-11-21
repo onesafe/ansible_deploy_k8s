@@ -1,0 +1,16 @@
+- name: Get current path
+  shell: "pwd"
+  register: pwd_res
+  run_once: true
+  delegate_to: localhost
+
+- name: Echo current path
+  debug: 
+    msg: "{{ pwd_res.stdout }}"
+  run_once: true
+  delegate_to: localhost
+
+- name: Executer python replace conf
+  shell: "python {{ pwd_res.stdout }}/replace.py"
+  run_once: true
+  delegate_to: localhost
