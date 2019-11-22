@@ -11,7 +11,7 @@
 * `inventory/hosts`
 * `inventory/group_vars/all/all.yml`
 
-## 部署集群 (v1.14.2版本的kubernetes)
+## 部署集群 (v1.8.15版本的kubernetes)
 `ansible-playbook -i inventory/hosts playbooks/site.yml`
 
 ##### 需要关注

@@ -45,7 +45,7 @@
   run_once: true
 
 - name: Generate dashboard kubeconfig file | Set cluster
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-cluster kubernetes 
+  shell: "roles/kubectl/files/v1.8.15/kubectl config set-cluster kubernetes 
   --certificate-authority=roles/cert/files/ca.pem 
   --embed-certs=true 
   --server={{ KUBE_APISERVER }} 
@@ -54,14 +54,14 @@
   run_once: true
 
 - name: Generate dashboard file | Set client credentials
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-credentials dashboard_user 
+  shell: "roles/kubectl/files/v1.8.15/kubectl config set-credentials dashboard_user 
   --token={{ login_token.stdout }}
   --kubeconfig=roles/dashboard/files/dashboard.kubeconfig"
   delegate_to: localhost
   run_once: true
 
 - name: Generate dashboard file | Set context
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-context default   
+  shell: "roles/kubectl/files/v1.8.15/kubectl config set-context default   
   --cluster=kubernetes 
   --user=dashboard_user 
   --kubeconfig=roles/dashboard/files/dashboard.kubeconfig"
@@ -69,7 +69,7 @@
   run_once: true
 
 - name: Generate dashboard file | Use context
-  shell: "roles/kubectl/files/v1.14.2/kubectl config use-context default  
+  shell: "roles/kubectl/files/v1.8.15/kubectl config use-context default  
   --kubeconfig=roles/dashboard/files/dashboard.kubeconfig"
   delegate_to: localhost
   run_once: true

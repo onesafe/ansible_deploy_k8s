@@ -1,10 +1,10 @@
-- name: Generate bootstrap token
-  shell: "/opt/k8s/bin/kubeadm token create --description kubelet-bootstrap-token --groups system:bootstrappers:{{ inventory_hostname }} --kubeconfig ~/.kube/config"
-  register: "bootstrap_token"
+# - name: Generate bootstrap token
+#   shell: "/opt/k8s/bin/kubeadm token create --description kubelet-bootstrap-token --groups system:bootstrappers:{{ inventory_hostname }} --kubeconfig ~/.kube/config"
+#   register: "bootstrap_token"
 
-- name: Echo bootstrap token
-  debug:
-    msg: "{{ bootstrap_token.stdout }}"
+# - name: Echo bootstrap token
+#   debug:
+#     msg: "{{ bootstrap_token.stdout }}"
 
 - name: Set cluster 
   shell: "/opt/k8s/bin/kubectl config set-cluster kubernetes 
@@ -14,7 +14,7 @@
 
 - name: Set client credentials
   shell: "/opt/k8s/bin/kubectl config set-credentials kubelet-bootstrap 
-  --token={{ bootstrap_token.stdout }}  
+  --token={{ BOOTSTRAP_TOKEN }}  
   --kubeconfig=/etc/kubernetes/kubelet-bootstrap.kubeconfig"
 
 - name: Set context
@@ -27,11 +27,11 @@
   shell: "/opt/k8s/bin/kubectl config use-context default   
   --kubeconfig=/etc/kubernetes/kubelet-bootstrap.kubeconfig"
 
-- name: Copy kubelet-config.yaml.template file
-  template:
-    src: kubelet-config.yaml.template
-    dest: /etc/kubernetes/kubelet-config.yaml
-    mode: 0755
+# - name: Copy kubelet-config.yaml.template file
+#   template:
+#     src: kubelet-config.yaml.template
+#     dest: /etc/kubernetes/kubelet-config.yaml
+#     mode: 0755
 
 - name: Copy kubelet.service.template file
   template:
@@ -40,7 +40,7 @@
     mode: 0755
 
 - name: Grant clusterrole
-  shell: "/opt/k8s/bin/kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --group=system:bootstrappers"
+  shell: "/opt/k8s/bin/kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap"
   run_once: true
   ignore_errors: true
 

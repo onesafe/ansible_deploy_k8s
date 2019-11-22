@@ -21,7 +21,7 @@
     mode: 0755
 
 - name: Generate kube-proxy kubeconfig file | Set cluster
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-cluster kubernetes 
+  shell: "roles/kubectl/files/v1.8.15/kubectl config set-cluster kubernetes 
   --certificate-authority=roles/cert/files/ca.pem 
   --embed-certs=true 
   --server={{ KUBE_APISERVER }} 
@@ -30,7 +30,7 @@
   run_once: true
 
 - name: Generate kube-proxy file | Set client credentials
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-credentials system:kube-proxy  
+  shell: "roles/kubectl/files/v1.8.15/kubectl config set-credentials system:kube-proxy  
   --client-certificate=roles/kube-proxy/files/kube-proxy.pem 
   --client-key=roles/kube-proxy/files/kube-proxy-key.pem 
   --embed-certs=true 
@@ -39,7 +39,7 @@
   run_once: true
 
 - name: Generate kube-proxy file | Set context
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-context default   
+  shell: "roles/kubectl/files/v1.8.15/kubectl config set-context default   
   --cluster=kubernetes 
   --user=system:kube-proxy  
   --kubeconfig=roles/kube-proxy/files/kube-proxy.kubeconfig"
@@ -47,7 +47,7 @@
   run_once: true
 
 - name: Generate kube-proxy file | Use context
-  shell: "roles/kubectl/files/v1.14.2/kubectl config use-context default  
+  shell: "roles/kubectl/files/v1.8.15/kubectl config use-context default  
   --kubeconfig=roles/kube-proxy/files/kube-proxy.kubeconfig"
   delegate_to: localhost
   run_once: true
@@ -104,11 +104,3 @@
     msg: "{{ kube_proxy_status.stdout }}"
   tags: 
     - "status"
-
-- name: Get ipvs route rule
-  shell: "/usr/sbin/ipvsadm -ln"
-  register: ipvs_route_rule
-
-- name: Echo ipvs route rule
-  debug:
-    msg: "{{ ipvs_route_rule.stdout }}"

@@ -5,44 +5,28 @@ Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 [Service]
 WorkingDirectory={{ K8S_DIR }}/kube-controller-manager
 ExecStart=/opt/k8s/bin/kube-controller-manager \
-  --profiling \
+  --port=10252 \
+  --address=127.0.0.1 \
+  --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \
+  --service-cluster-ip-range={{ SERVICE_CIDR }} \
   --cluster-name=kubernetes \
-  --controllers=*,bootstrapsigner,tokencleaner \
-  --kube-api-qps=1000 \
-  --kube-api-burst=2000 \
-  --leader-elect \
-  --use-service-account-credentials=true \
-  --concurrent-service-syncs=2 \
-  --bind-address={{ ansible_host }} \
-  --secure-port=10252 \
-  --tls-cert-file=/etc/kubernetes/cert/kube-controller-manager.pem \
-  --tls-private-key-file=/etc/kubernetes/cert/kube-controller-manager-key.pem \
-  --port=0 \
-  --authentication-kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \
-  --client-ca-file=/etc/kubernetes/cert/ca.pem \
-  --requestheader-allowed-names="" \
-  --requestheader-client-ca-file=/etc/kubernetes/cert/ca.pem \
-  --requestheader-extra-headers-prefix="X-Remote-Extra-" \
-  --requestheader-group-headers=X-Remote-Group \
-  --requestheader-username-headers=X-Remote-User \
-  --authorization-kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \
   --cluster-signing-cert-file=/etc/kubernetes/cert/ca.pem \
   --cluster-signing-key-file=/etc/kubernetes/cert/ca-key.pem \
-  --experimental-cluster-signing-duration=876000h \
-  --horizontal-pod-autoscaler-sync-period=10s \
-  --concurrent-deployment-syncs=10 \
-  --concurrent-gc-syncs=30 \
-  --node-cidr-mask-size=24 \
-  --service-cluster-ip-range={{ SERVICE_CIDR }} \
-  --pod-eviction-timeout=6m \
-  --terminated-pod-gc-threshold=10000 \
+  --experimental-cluster-signing-duration=8760h \
   --root-ca-file=/etc/kubernetes/cert/ca.pem \
   --service-account-private-key-file=/etc/kubernetes/cert/ca-key.pem \
-  --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \
+  --feature-gates=RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true,Accelerators=true,DevicePlugins=true \
+  --leader-elect=true \
+  --controllers=*,bootstrapsigner,tokencleaner \
+  --use-service-account-credentials=true \
+  --kube-api-qps=1000 \
+  --kube-api-burst=2000 \
   --logtostderr=true \
   --v=2
-Restart=on-failure
+Restart=always
 RestartSec=5
+StartLimitInterval=0
 
 [Install]
 WantedBy=multi-user.target
+

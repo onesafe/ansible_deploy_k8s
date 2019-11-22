@@ -20,6 +20,12 @@
     dest: /etc/kubernetes/cert/kubernetes-key.pem
     mode: 0755
 
+- name: Copy token.csv
+  template:
+    src: token.csv
+    dest: /etc/kubernetes/token.csv
+    mode: 0755
+
 - name: Copy encryption-config.yaml file
   template:
     src: encryption-config.yaml
@@ -87,6 +93,9 @@
   tags: 
     - "status"
 
+- name: Sleep 2s
+  shell: "sleep 2"
+
 - name: Get kube-apiserver etcd data
   shell: "ETCDCTL_API=3 /opt/k8s/bin/etcdctl --endpoints={{ ETCD_ENDPOINTS }} --cacert=/etc/kubernetes/cert/ca.pem --cert=/etc/etcd/cert/etcd.pem --key=/etc/etcd/cert/etcd-key.pem get /registry/ --prefix --keys-only"
   register: etcd_kube_apiserver_data
@@ -94,6 +103,15 @@
 - name: Echo etcd kube-apiserver data
   debug:
     msg: "{{ etcd_kube_apiserver_data.stdout }}"
+
+- name: Copy kubelet-api-admin.yaml
+  copy:
+    src: kubelet-api-admin.yaml
+    dest: /etc/kubernetes/kubelet-api-admin.yaml
+
+- name: Kubectl create -f kubelet-api-admin.yaml
+  shell: "/opt/k8s/bin/kubectl create -f /etc/kubernetes/kubelet-api-admin.yaml"
+  run_once: true
 
 - name: Grant kube-apiserver rbac to access kubelet api
   shell: "/opt/k8s/bin/kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole=system:kubelet-api-admin --user kubernetes"

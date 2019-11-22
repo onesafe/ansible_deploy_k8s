@@ -41,3 +41,6 @@
 - name: Delete docker bridge
   shell: "ip link del docker0"
   ignore_errors: true
+
+- name: Delete kubelet.kubeconfig
+  shell: "rm -rf /etc/kubernetes/kubelet.kubeconfig"

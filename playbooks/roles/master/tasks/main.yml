@@ -1,7 +1,7 @@
 # 如果网速比较慢的话，这个task可以注释掉，先下载下来传到节点上/opt/k8s/work/
-- name: download v1.14.2 kubernetes-server 
+- name: download v1.8.15 kubernetes-server 
   get_url:
-    url: http://branw.cn:35001/v1.14.2/kubernetes-server-linux-amd64.tar.gz
+    url: http://branw.cn:35001/v1.8.15/kubernetes-server-linux-amd64.tar.gz
     dest: /opt/k8s/work/kubernetes-server-linux-amd64.tar.gz
     validate_certs: no
 
@@ -12,7 +12,7 @@
   shell: "cd /opt/k8s/work/kubernetes && tar -zxvf kubernetes-src.tar.gz"
 
 - name: Copy kubernetes bin 
-  shell: "cp /opt/k8s/work/kubernetes/server/bin/{apiextensions-apiserver,cloud-controller-manager,kube-apiserver,kube-controller-manager,kube-proxy,kube-scheduler,kubeadm,kubectl,kubelet,mounter} /opt/k8s/bin/"
+  shell: "cp /opt/k8s/work/kubernetes/server/bin/{apiextensions-apiserver,cloud-controller-manager,kube-apiserver,kube-controller-manager,kube-proxy,kube-scheduler,kubeadm,kubectl,kubelet} /opt/k8s/bin/"
   ignore_errors: true
 
 - name: Chmod u+x /opt/k8s/bin
