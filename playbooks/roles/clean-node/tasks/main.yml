@@ -25,6 +25,12 @@
 - name: Delete systemd unit file
   shell: "rm -rf /etc/systemd/system/{kubelet,docker,flanneld,kube-nginx}.service"
 
+- name: Delete docker.service.requires flanneld unit file
+  shell: "rm -rf /etc/systemd/system/docker.service.requires/flanneld.service"
+
+- name: Delete multi-user.target.wants flanneld unit file
+  shell: "rm -rf /etc/systemd/system/multi-user.target.wants/flanneld.service"
+
 - name: Delete process dir
   shell: "rm -rf /opt/k8s/bin"
 
