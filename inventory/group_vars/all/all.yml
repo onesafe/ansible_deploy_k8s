@@ -10,10 +10,10 @@ host2: wyp-k8s02
 host3: wyp-k8s03
 
 # 集群各机器 IP 数组
-NODE_IPS: 172.27.129.68, 172.27.129.69, 172.27.129.70
+NODE_IPS: "{{ k8s01 }}", "{{ k8s02 }}", "{{ k8s03 }}"
 
 # 集群各 IP 对应的主机名数组
-NODE_NAMES: wyp-k8s01, wyp-k8s02, wyp-k8s03
+NODE_NAMES: "{{ host1 }}", "{{ host2 }}", "{{ host3 }}"
 
 
 # etcd 集群间通信的 IP 和端口
