@@ -8,6 +8,12 @@
   delegate_to: localhost
   run_once: true
 
+- name: Mkdir /data/k8s/k8s/kube-apiserver
+  file:
+    path: /data/k8s/k8s/kube-apiserver
+    state: directory
+    mode: "0755"
+
 - name: Copy kubernetes.pem
   copy:
     src: kubernetes.pem
