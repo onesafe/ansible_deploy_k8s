@@ -3,24 +3,24 @@
 # wyp-k8s01 为设置的主机名 
 
 [all]
-wyp-k8s01 ansible_host=172.27.129.68  etcd_member_name=etcd1
-wyp-k8s02 ansible_host=172.27.129.69 etcd_member_name=etcd2
-wyp-k8s03 ansible_host=172.27.129.70 etcd_member_name=etcd3
+di01 ansible_host=172.27.129.117  etcd_member_name=etcd1
+di02 ansible_host=172.27.129.118 etcd_member_name=etcd2
+di03 ansible_host=172.27.129.119 etcd_member_name=etcd3
 
 [etcd]
-wyp-k8s01
-wyp-k8s02
-wyp-k8s03
+di01
+di02
+di03
 
 [k8s_master]
-wyp-k8s01
-wyp-k8s02
-wyp-k8s03
+di01
+di02
+di03
 
 [k8s_node]
-wyp-k8s01
-wyp-k8s02
-wyp-k8s03
+di01
+di02
+di03
 
 [k8s_cluster:children]
 etcd

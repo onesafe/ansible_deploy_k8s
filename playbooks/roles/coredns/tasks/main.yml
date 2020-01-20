@@ -1,13 +1,16 @@
-- name: Backup coredns.yaml 
-  shell: "cp /opt/k8s/work/kubernetes/cluster/addons/dns/coredns/coredns.yaml.base /opt/k8s/work/kubernetes/cluster/addons/dns/coredns/coredns.yaml"
-
+- name: Copy containerd
+  copy:
+    src: coredns.yaml.base
+    dest: /opt/k8s/work/coredns.yaml
+    mode: 0755
+  
 - name: Replace some env in coredns.yaml
-  shell: 'sed -i -e "s/__PILLAR__DNS__DOMAIN__/{{ CLUSTER_DNS_DOMAIN }}/" -e "s/__PILLAR__DNS__SERVER__/{{ CLUSTER_DNS_SVC_IP }}/" /opt/k8s/work/kubernetes/cluster/addons/dns/coredns/coredns.yaml'
+  shell: 'sed -i -e "s/__PILLAR__DNS__MEMORY__LIMIT__/170Mi/" -e "s/__PILLAR__DNS__DOMAIN__/{{ CLUSTER_DNS_DOMAIN }}/" -e "s/__PILLAR__DNS__SERVER__/{{ CLUSTER_DNS_SVC_IP }}/" /opt/k8s/work/coredns.yaml'
 
 - name: Use gcr proxy to pull gcr.io image
-  shell: 'sed -i -e "s@k8s.gcr.io@{{ GCR_PROXY }}@" /opt/k8s/work/kubernetes/cluster/addons/dns/coredns/coredns.yaml' 
+  shell: 'sed -i -e "s@k8s.gcr.io@{{ GCR_PROXY }}@" /opt/k8s/work/coredns.yaml' 
 
 - name: Kubectl create coredns
-  shell: "/opt/k8s/bin/kubectl create -f /opt/k8s/work/kubernetes/cluster/addons/dns/coredns/coredns.yaml"
+  shell: "/opt/k8s/bin/kubectl apply -f /opt/k8s/work/coredns.yaml"
   run_once: true
 

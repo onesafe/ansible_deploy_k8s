@@ -1,14 +1,44 @@
+- name: Mkdir /opt/k8s/work/dashboard
+  file:
+    path: /opt/k8s/work/dashboard
+    state: directory
+    mode: "0755"
+
 - name: Copy dashboard-service.yaml file
   copy:
     src: dashboard-service.yaml
-    dest: /opt/k8s/work/kubernetes/cluster/addons/dashboard/dashboard-service.yaml
+    dest: /opt/k8s/work/dashboard/dashboard-service.yaml
+    mode: 0755
+
+- name: Copy dashboard-configmap.yaml file
+  copy:
+    src: dashboard-configmap.yaml
+    dest: /opt/k8s/work/dashboard/dashboard-configmap.yaml
+    mode: 0755
+
+- name: Copy dashboard-controller.yaml file
+  copy:
+    src: dashboard-controller.yaml
+    dest: /opt/k8s/work/dashboard/dashboard-controller.yaml
+    mode: 0755
+
+- name: Copy dashboard-rbac.yaml file
+  copy:
+    src: dashboard-rbac.yaml
+    dest: /opt/k8s/work/dashboard/dashboard-rbac.yaml
+    mode: 0755
+
+- name: Copy dashboard-secret.yaml file
+  copy:
+    src: dashboard-secret.yaml
+    dest: /opt/k8s/work/dashboard/dashboard-secret.yaml
     mode: 0755
 
 - name: Use gcr proxy to pull gcr.io image
-  shell: 'sed -i -e "s@k8s.gcr.io@{{ GCR_PROXY }}@" /opt/k8s/work/kubernetes/cluster/addons/dashboard/dashboard-controller.yaml' 
+  shell: 'sed -i -e "s@k8s.gcr.io@{{ GCR_PROXY }}@" /opt/k8s/work/dashboard/dashboard-controller.yaml' 
 
 - name: Kubectl create dashboard
-  shell: "/opt/k8s/bin/kubectl apply -f /opt/k8s/work/kubernetes/cluster/addons/dashboard"
+  shell: "/opt/k8s/bin/kubectl apply -f /opt/k8s/work/dashboard"
   run_once: true
 
 - name: Get dashboard NodePort
@@ -45,7 +75,7 @@
   run_once: true
 
 - name: Generate dashboard kubeconfig file | Set cluster
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-cluster kubernetes 
+  shell: "roles/kubectl/files/v1.16.5/kubectl config set-cluster kubernetes 
   --certificate-authority=roles/cert/files/ca.pem 
   --embed-certs=true 
   --server={{ KUBE_APISERVER }} 
@@ -54,14 +84,14 @@
   run_once: true
 
 - name: Generate dashboard file | Set client credentials
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-credentials dashboard_user 
+  shell: "roles/kubectl/files/v1.16.5/kubectl config set-credentials dashboard_user 
   --token={{ login_token.stdout }}
   --kubeconfig=roles/dashboard/files/dashboard.kubeconfig"
   delegate_to: localhost
   run_once: true
 
 - name: Generate dashboard file | Set context
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-context default   
+  shell: "roles/kubectl/files/v1.16.5/kubectl config set-context default   
   --cluster=kubernetes 
   --user=dashboard_user 
   --kubeconfig=roles/dashboard/files/dashboard.kubeconfig"
@@ -69,7 +99,7 @@
   run_once: true
 
 - name: Generate dashboard file | Use context
-  shell: "roles/kubectl/files/v1.14.2/kubectl config use-context default  
+  shell: "roles/kubectl/files/v1.16.5/kubectl config use-context default  
   --kubeconfig=roles/dashboard/files/dashboard.kubeconfig"
   delegate_to: localhost
   run_once: true

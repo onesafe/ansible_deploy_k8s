@@ -1,6 +1,6 @@
 - name: Copy kubectl bin
   copy:
-    src: v1.14.2/kubectl
+    src: v1.16.5/kubectl
     dest: /opt/k8s/bin
     mode: 0755
 
@@ -14,7 +14,7 @@
   run_once: true
 
 - name: Generate kubeconfig file | Set cluster
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-cluster kubernetes 
+  shell: "roles/kubectl/files/v1.16.5/kubectl config set-cluster kubernetes 
   --certificate-authority=roles/cert/files/ca.pem 
   --embed-certs=true 
   --server={{ KUBE_APISERVER }} 
@@ -23,7 +23,7 @@
   run_once: true
 
 - name: Generate kubeconfig file | Set client credentials
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-credentials admin 
+  shell: "roles/kubectl/files/v1.16.5/kubectl config set-credentials admin 
   --client-certificate=roles/kubectl/files/admin.pem 
   --client-key=roles/kubectl/files/admin-key.pem 
   --embed-certs=true 
@@ -32,7 +32,7 @@
   run_once: true
 
 - name: Generate kubeconfig file | Set context
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-context kubernetes 
+  shell: "roles/kubectl/files/v1.16.5/kubectl config set-context kubernetes 
   --cluster=kubernetes 
   --user=admin 
   --kubeconfig=roles/kubectl/files/kubectl.kubeconfig"
@@ -40,7 +40,7 @@
   run_once: true
 
 - name: Generate kubeconfig file | Use context
-  shell: "roles/kubectl/files/v1.14.2/kubectl config use-context kubernetes 
+  shell: "roles/kubectl/files/v1.16.5/kubectl config use-context kubernetes 
   --kubeconfig=roles/kubectl/files/kubectl.kubeconfig"
   delegate_to: localhost
   run_once: true

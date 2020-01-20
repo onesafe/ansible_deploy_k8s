@@ -21,7 +21,7 @@
     mode: 0755
 
 - name: Generate kube-controller-manager kubeconfig file | Set cluster
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-cluster kubernetes 
+  shell: "roles/kubectl/files/v1.16.5/kubectl config set-cluster kubernetes 
   --certificate-authority=roles/cert/files/ca.pem 
   --embed-certs=true 
   --server={{ KUBE_APISERVER }} 
@@ -30,7 +30,7 @@
   run_once: true
 
 - name: Generate kube-controller-manager file | Set client credentials
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-credentials system:kube-controller-manager  
+  shell: "roles/kubectl/files/v1.16.5/kubectl config set-credentials system:kube-controller-manager  
   --client-certificate=roles/controller-manager/files/kube-controller-manager.pem 
   --client-key=roles/controller-manager/files/kube-controller-manager-key.pem 
   --embed-certs=true 
@@ -39,7 +39,7 @@
   run_once: true
 
 - name: Generate kube-controller-manager file | Set context
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-context system:kube-controller-manager  
+  shell: "roles/kubectl/files/v1.16.5/kubectl config set-context system:kube-controller-manager  
   --cluster=kubernetes 
   --user=system:kube-controller-manager  
   --kubeconfig=roles/controller-manager/files/kube-controller-manager.kubeconfig"
@@ -47,7 +47,7 @@
   run_once: true
 
 - name: Generate kube-controller-manager file | Use context
-  shell: "roles/kubectl/files/v1.14.2/kubectl config use-context system:kube-controller-manager  
+  shell: "roles/kubectl/files/v1.16.5/kubectl config use-context system:kube-controller-manager  
   --kubeconfig=roles/controller-manager/files/kube-controller-manager.kubeconfig"
   delegate_to: localhost
   run_once: true

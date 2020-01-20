@@ -21,7 +21,7 @@
     mode: 0755
 
 - name: Generate kube-scheduler kubeconfig file | Set cluster
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-cluster kubernetes 
+  shell: "roles/kubectl/files/v1.16.5/kubectl config set-cluster kubernetes 
   --certificate-authority=roles/cert/files/ca.pem 
   --embed-certs=true 
   --server={{ KUBE_APISERVER }} 
@@ -30,7 +30,7 @@
   run_once: true
 
 - name: Generate kube-scheduler file | Set client credentials
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-credentials system:kube-scheduler   
+  shell: "roles/kubectl/files/v1.16.5/kubectl config set-credentials system:kube-scheduler   
   --client-certificate=roles/kube-scheduler/files/kube-scheduler.pem 
   --client-key=roles/kube-scheduler/files/kube-scheduler-key.pem 
   --embed-certs=true 
@@ -39,7 +39,7 @@
   run_once: true
 
 - name: Generate kube-scheduler file | Set context
-  shell: "roles/kubectl/files/v1.14.2/kubectl config set-context system:kube-scheduler   
+  shell: "roles/kubectl/files/v1.16.5/kubectl config set-context system:kube-scheduler   
   --cluster=kubernetes 
   --user=system:kube-scheduler  
   --kubeconfig=roles/kube-scheduler/files/kube-scheduler.kubeconfig"
@@ -47,7 +47,7 @@
   run_once: true
 
 - name: Generate kube-scheduler file | Use context
-  shell: "roles/kubectl/files/v1.14.2/kubectl config use-context system:kube-scheduler 
+  shell: "roles/kubectl/files/v1.16.5/kubectl config use-context system:kube-scheduler 
   --kubeconfig=roles/kube-scheduler/files/kube-scheduler.kubeconfig"
   delegate_to: localhost
   run_once: true

@@ -10,6 +10,9 @@
   shell: "/opt/k8s/bin/kubectl delete deploy kubernetes-dashboard  -n kube-system"
   ignore_errors: true
 
+- name: Delete /etc/cni/net.d
+  shell: "rm -rf /etc/cni/net.d"
+
 - name: Delete kubelet dir
   shell: "rm -rf {{ K8S_DIR }}/kubelet"
 

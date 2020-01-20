@@ -4,14 +4,14 @@
 - include: cert.yml
 - include: kubectl.yml
 - include: etcd.yml
-- include: flannel.yml
+- include: containerd.yml
 - include: kube-nginx.yml
 - include: master.yml
 - include: apiserver.yml
 - include: controller-manager.yml
 - include: kube-scheduler.yml
-- include: docker.yml
 - include: kubelet.yml
+- include: calico.yml
 - include: kube-proxy.yml
 - include: coredns.yml
 - include: dashboard.yml

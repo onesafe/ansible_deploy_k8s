@@ -1,0 +1,121 @@
+- name: Copy containerd
+  copy:
+    src: containerd-1.3.0.linux-amd64.tar.gz
+    dest: /opt/k8s/work/
+    mode: 0755
+
+- name: Copy cni-plugins
+  copy:
+    src: cni-plugins-linux-amd64-v0.8.4.tgz
+    dest: /opt/k8s/work/
+    mode: 0755
+
+- name: Copy runc
+  copy:
+    src: runc.amd64
+    dest: /opt/k8s/bin/runc
+    mode: 0755
+
+- name: Copy crictl
+  copy:
+    src: crictl
+    dest: /opt/k8s/bin/crictl
+    mode: 0755
+
+- name: Mkdir /opt/k8s/work/containerd
+  file:
+    path: /opt/k8s/work/containerd
+    state: directory
+    mode: "0755"
+
+- name: tar containerd
+  shell: "tar -xvf /opt/k8s/work/containerd-1.3.0.linux-amd64.tar.gz -C /opt/k8s/work/containerd"
+
+- name: copy containerd bin to /opt/k8s/bin
+  shell: "cp -r /opt/k8s/work/containerd/bin/* /opt/k8s/bin/"
+  ignore_errors: true
+
+- name: Mkdir /opt/k8s/work/cni-plugins
+  file:
+    path: /opt/k8s/work/cni-plugins
+    state: directory
+    mode: "0755"
+
+- name: tar cni-plugins
+  shell: "tar -xvf /opt/k8s/work/cni-plugins-linux-amd64-v0.8.4.tgz -C /opt/k8s/work/cni-plugins"
+
+- name: copy cni-plugins bin to /opt/k8s/bin
+  shell: "cp -r /opt/k8s/work/cni-plugins/* /opt/k8s/bin/"
+  ignore_errors: true
+
+- name: chmod u+x
+  shell: "chmod a+x /opt/k8s/bin/*"
+
+- name: Mkdir /etc/cni/net.d
+  file:
+    path: /etc/cni/net.d
+    state: directory
+    mode: "0755"
+
+- name: Mkdir /etc/containerd
+  file:
+    path: /etc/containerd
+    state: directory
+    mode: "0755"
+
+- name: Mkdir /data/containerd/root
+  file:
+    path: /data/containerd/root
+    state: directory
+    mode: "0755"
+
+- name: Mkdir /data/containerd/state
+  file:
+    path: /data/containerd/state
+    state: directory
+    mode: "0755"
+
+- name: Copy containerd-config file
+  template:
+    src: containerd-config.toml
+    dest: /etc/containerd/config.toml
+    mode: 0755
+
+- name: Copy containerd.service
+  template:
+    src: containerd.service.template
+    dest: /etc/systemd/system/containerd.service
+    mode: 0755
+
+- name: Just force systemd to reread configs (2.4 and above)
+  systemd:
+    daemon_reload: yes
+
+- name: Enable containerd service
+  systemd:
+    name: containerd
+    enabled: yes
+    masked: no
+
+- name: Restart containerd service
+  systemd:
+    state: restarted
+    name: containerd
+
+- name: Copy crictl.yaml
+  template:
+    src: crictl.yaml
+    dest: /etc/crictl.yaml
+    mode: 0755
+
+# - name: Get crictl images
+#   shell: "/opt/k8s/bin/crictl images"
+#   register: crictl_images
+#   tags: 
+#     - "status"
+
+# - name: Echo crictl images
+#   debug:
+#     msg: "{{ crictl_images.stdout }}"
+#   tags: 
+#     - "status"

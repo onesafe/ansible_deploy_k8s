@@ -11,11 +11,8 @@
 * `inventory/hosts`
 * `inventory/group_vars/all/all.yml`
 
-## 部署集群 (v1.14.2版本的kubernetes)
+## 部署集群 (v1.16.5版本的kubernetes)
 `ansible-playbook -i inventory/hosts playbooks/site.yml`
-
-##### 需要关注
-* 下载kubernetes-server-linux-amd64.tar.gz文件慢的话（playbooks/roles/master），可以注释掉roles/master/tasks/main.yml，手动先下载上传到节点/opt/k8s/work/路径下
 
 ## 查看集群服务状态
 `ansible-playbook -i inventory/hosts playbooks/site.yml --tags "status"`

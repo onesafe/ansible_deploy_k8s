@@ -33,6 +33,7 @@
       - sysstat
       - libseccomp
       - wget
+      - socat
     state: present
 
 # - name: Stop and disable fireward

@@ -1,18 +1,23 @@
-# 如果网速比较慢的话，这个task可以注释掉，先下载下来传到节点上/opt/k8s/work/
-- name: download v1.14.2 kubernetes-server 
-  get_url:
-    url: http://branw.cn:35001/v1.14.2/kubernetes-server-linux-amd64.tar.gz
-    dest: /opt/k8s/work/kubernetes-server-linux-amd64.tar.gz
-    validate_certs: no
+- name: Copy kubernetes-v1.16.5
+  copy:
+    src: kubernetes-v1.16.5-01.tar.gz
+    dest: /opt/k8s/work/
+    mode: 0755
 
-- name: Tar zxvf kubernetes-server
-  shell: "cd /opt/k8s/work && tar -xzvf kubernetes-server-linux-amd64.tar.gz"
+- name: Copy kubernetes-v1.16.5
+  copy:
+    src: kubernetes-v1.16.5-02.tar.gz
+    dest: /opt/k8s/work/
+    mode: 0755
 
-- name: Tar zxvf kubernetes-src
-  shell: "cd /opt/k8s/work/kubernetes && tar -zxvf kubernetes-src.tar.gz"
+- name: Tar zxvf kubernetes-server kube-apiserver kube-controller-manager
+  shell: "cd /opt/k8s/work && tar -xzvf kubernetes-v1.16.5-01.tar.gz"
+
+- name: Tar zxvf kubernetes-server kubelet kube-proxy kube-scheduler kubeadm
+  shell: "cd /opt/k8s/work && tar -xzvf kubernetes-v1.16.5-02.tar.gz"
 
 - name: Copy kubernetes bin 
-  shell: "cp /opt/k8s/work/kubernetes/server/bin/{apiextensions-apiserver,cloud-controller-manager,kube-apiserver,kube-controller-manager,kube-proxy,kube-scheduler,kubeadm,kubectl,kubelet,mounter} /opt/k8s/bin/"
+  shell: "cp /opt/k8s/work/{kube-apiserver,kube-controller-manager,kube-proxy,kube-scheduler,kubelet,kubeadm} /opt/k8s/bin/"
   ignore_errors: true
 
 - name: Chmod u+x /opt/k8s/bin

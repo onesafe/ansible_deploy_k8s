@@ -1,0 +1,10 @@
+- name: Copy calico.yaml
+  copy:
+    src: calico.yaml
+    dest: /opt/k8s/work/
+    mode: 0755
+
+- name: Kubectl apply -f calico.yaml
+  shell: "/opt/k8s/bin/kubectl apply -f /opt/k8s/work/calico.yaml"
+  run_once: true
+
